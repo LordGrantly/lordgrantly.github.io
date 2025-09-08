@@ -61,7 +61,8 @@
     const openModal = document.getElementById('openModal');
     const closeModal = document.getElementById('closeModal');
     const modalOverlay = document.getElementById('modalOverlay');
-
+    const tekst = document.getElementById('tekst');
+    const przycisk = document.getElementById('przycisk');
     // Open modal
     openModal.addEventListener('click', () => {
       modalOverlay.style.display = 'block';
@@ -78,8 +79,9 @@
         modalOverlay.style.display = 'none';
       }
     });
+    
   </script>
-  <input type="text" name = "tekst" />
+  <input type="text" id = "tekst" />
   <button id="przysisk"></button>
 </body>
 </html>
