@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        
+
+     .modal-overlay {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(100, 100, 100, 0.5);
+      z-index: 1000; 
     .button-container {
       display: flex;
       gap: 10px; 
@@ -37,7 +46,8 @@
         chciałbym zostać elektrykiem ponieważ prąd jest cool i cool jest fajne a ja lubię fajne rzeczy i lubię prąd wię chiałbym być elektrykiem ponieważ eletryk pracuje z prądem a prąd jest cool<br>
         chciałbym być imformatykiem ponieważ komputery są fajne i lubie pracować z komputerami ponieaż na kompoterach można wielae zdziałać
     </ul>
-    
+    <div class="modal-overlay" id="bg">
+    </div>
     <p id="pe">You have not pressed the button yet </p>
     <button id="button">button</button>
     <br><br><br>
@@ -58,6 +68,7 @@
         b= 0;
         a= 0.3;
         m= 1;
+        const bg = document.getElementById('bg');
         const button = document.getElementById('button');
         const red = document.getElementById('red');
         const green = document.getElementById('green');
@@ -76,22 +87,21 @@
         });
         red.addEventListener('click', () => {
             r = m+r;
-            document.body.style.backgroundColor = rgba(r, g, b, a/10);
+            bg.style.background = rgba(r, g, b, a/10);
             
         });
         green.addEventListener('click', () => {
             g = m+g;
-            document.body.style.backgroundColor = rgba(r, g, b, a/10);
-            
+            bg.style.background = rgba(r, g, b, a/10);
         });
         blue.addEventListener('click', () => {
             b = m +b;
-            document.body.style.backgroundColor = rgba(r, g, b, a/10);
+            bg.style.background = rgba(r, g, b, a/10);
             
         });
         alpha.addEventListener('click', () => {
             a ++;
-            document.body.style.backgroundColor = rgba(r, g, b, a/10);
+            bg.style.background = rgba(r, g, b, a/10);
             
         });
         multi.addEventListener('click', () => {
@@ -110,6 +120,7 @@
 </body>
     
 </html>
+
 
 
 
