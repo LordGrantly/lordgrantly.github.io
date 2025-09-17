@@ -42,13 +42,22 @@
     <button id="button">button</button>
     <br><br><br>
     <div class="button-container">
+    <button id="+/-"><p id="+czy-">+</p></button>
+    <button id="multi">multi</button>
     <button id="red">red</button>
     <button id="green">green</button>
     <button id="blue">blue</button>
     <button id="alpha">alpha</button>
     </div>
     <script>
+        c = 0;
+        l = [1,2,5,10];
         x = 0;
+        r= 0;
+        g= 0;
+        b= 0;
+        a= 0.3;
+        m= 1;
         const button = document.getElementById('button');
         const pe = document.getElementById("pe");
 
@@ -59,8 +68,32 @@
             
         });
         red.addEventListener('click', () => {
-            r++;
-            document.body.style.backgroundColor = 'rgba(r, g, b, a)';
+            r += m;
+            document.body.style.backgroundColor = 'rgba(r, g, b, a/10)';
+            
+        });
+        green.addEventListener('click', () => {
+            g += m;
+            document.body.style.backgroundColor = 'rgba(r, g, b, a/10)';
+            
+        });
+        blue.addEventListener('click', () => {
+            b += m;
+            document.body.style.backgroundColor = 'rgba(r, g, b, a/10)';
+            
+        });
+        alpha.addEventListener('click', () => {
+            a ++;
+            document.body.style.backgroundColor = 'rgba(r, g, b, a/10)';
+            
+        });
+        blue.addEventListener('click', () => {
+            c++;
+            if c < l.length{
+                c=0;
+            }
+            m = l[c]
+            
             
         });
     </script>
@@ -70,6 +103,7 @@
 </body>
     
 </html>
+
 
 
 
