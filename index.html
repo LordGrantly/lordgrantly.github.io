@@ -42,7 +42,7 @@
     <button id="button">button</button>
     <br><br><br>
     <div class="button-container">
-    <button id="+/-"><p id="+czy-">+</p></button>
+    <button id="znak"><p id="tekst_znak">+</p></button>
     <button id="multi">multi</button>
     <button id="red">red</button>
     <button id="green">green</button>
@@ -59,6 +59,13 @@
         a= 0.3;
         m= 1;
         const button = document.getElementById('button');
+        const red = document.getElementById('red');
+        const green = document.getElementById('green');
+        const blue = document.getElementById('blue');
+        const alpha = document.getElementById('alpha');
+        const multi = document.getElementById('multi');
+        const znak = document.getElementById('znak');
+        const tekst_znak = document.getElementById('tekst_znak');
         const pe = document.getElementById("pe");
 
        
@@ -87,7 +94,7 @@
             document.body.style.backgroundColor = 'rgba(r, g, b, a/10)';
             
         });
-        blue.addEventListener('click', () => {
+        multi.addEventListener('click', () => {
             c++;
             if c < l.length{
                 c=0;
@@ -103,6 +110,7 @@
 </body>
     
 </html>
+
 
 
 
