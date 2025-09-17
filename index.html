@@ -6,6 +6,9 @@
     <title>Document</title>
     <style>
         
+    .button-container {
+      display: flex;
+      gap: 10px; /* Space between buttons */
 
 
 
@@ -37,7 +40,12 @@
     <img src=""/>
     <p id="pe"> x </p>
     <button id="button">button</button>
-
+    <div class="button-container">
+    <button id="red">red</button>
+    <button id="blue">blue</button>
+    <button id="green">green</button>
+    <button id="alpha">alpha</button>
+    </div>
     <script>
         x = 0;
         const button = document.getElementById('button');
@@ -47,6 +55,7 @@
         button.addEventListener('click', () => {
             x++;
              pe.textContent="You have pressed the button "+x+" times";
+            
         });
         
     </script>
@@ -56,6 +65,7 @@
 </body>
     
 </html>
+
 
 
 
