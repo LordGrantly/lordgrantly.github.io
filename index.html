@@ -13,11 +13,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(100, 100, 100, 0.5);
+      background: rgba(0, 0, 0, 0.5);
       z-index: 1000; 
+     }
     .button-container {
       display: flex;
       gap: 10px; 
+    }
 
 
 
@@ -62,7 +64,14 @@
     </div>
     </div>
     
+    
+
+    
+    
+</body>
+    
     <script>
+        
         i = 0;
         s= 0;
         c = 0;
@@ -92,26 +101,47 @@
         });
         red.addEventListener('click', () => {
             r = m+r;
+            if (r > 255){
+                r=255
+            }
+            if (r < 0){
+                r=0
+            }
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
-
+            red.innerText = "red: "+r;
             
         });
         green.addEventListener('click', () => {
             g = m+g;
+            if (g > 255){
+                g=255
+            }
+            if (g < 0){
+                g=0
+            }
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
-
+            green.innerText = "green: "+g;
         });
         blue.addEventListener('click', () => {
             b = m+b;
+            if (b > 255){
+                b=255
+            }
+            if (b < 0){
+                b=0
+            }
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
-
+            blue.innerText = "blue: "+b;
             
         });
         alpha.addEventListener('click', () => {
             a = a+1/10;
-            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
-
             
+            if (a > 1){
+                a=0.1
+            }
+            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
+            alpha.innerText = "alpha: "+a;
         });
         multi.addEventListener('click', () => {
             c++;
@@ -119,7 +149,7 @@
                 c=0;
             }
             m = l[c];
-            
+            multi.innerText = "multi: "+m;
             
         });
         znak.addEventListener('click', () => {
@@ -128,18 +158,22 @@
             s="-";
             for (let i = 0; i < l.length; i++) {
                 l[i] = l[i] * -1;
+                m = l[i];
             }
-
+        }
             if (znak.innerText =="-"){
             
             s="+";
             for (let i = 0; i < l.length; i++) {
                 l[i] = l[i] * -1;
+                m = l[i];
             }
 
             }
             znak.innerText = s;
+            multi.innerText = "multi: "+m;
         });
+  
     </script>
 
     
@@ -147,6 +181,7 @@
 </body>
     
 </html>
+
 
 
 
