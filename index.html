@@ -63,6 +63,7 @@
     </div>
     
     <script>
+        s= 0;
         c = 0;
         l = [1,2,5,10];
         x = 0;
@@ -120,6 +121,15 @@
             
             
         });
+        znak.addEventListener('click', () => {
+            if s==0{
+            znak_tekst.textContent="-";
+            s=1
+            }
+            if s==1{
+            znak_tekst.textContent="+";
+            s=0
+            }
     </script>
 
     
@@ -127,6 +137,7 @@
 </body>
     
 </html>
+
 
 
 
