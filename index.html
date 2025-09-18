@@ -90,26 +90,30 @@
         });
         red.addEventListener('click', () => {
             r = m+r;
-            bg.style.background = rgba(r, g, b, a/10);
+            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
+
             
         });
         green.addEventListener('click', () => {
             g = m+g;
-            bg.style.background = rgba(r, g, b, a/10);
+            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
+
         });
         blue.addEventListener('click', () => {
             b = m +b;
-            bg.style.background = rgba(r, g, b, a/10);
+            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
+
             
         });
         alpha.addEventListener('click', () => {
             a ++;
-            bg.style.background = rgba(r, g, b, a/10);
+            bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
+
             
         });
         multi.addEventListener('click', () => {
             c++;
-            if (c > l.length){
+            if (c >= l.length){
                 c=0;
             }
             m = l[c]
@@ -123,6 +127,7 @@
 </body>
     
 </html>
+
 
 
 
