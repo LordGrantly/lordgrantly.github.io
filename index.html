@@ -126,15 +126,17 @@
             if (znak.innerText=="+"){
             
             s="-"
-            for (i=0,i<l.length,i++){
-                l[i] = l[i]*-1
+            for (let i = 0; i < l.length; i++) {
+                l[i] = l[i] * -1;
             }
+
             if (znak.innerText =="-"){
             
             s="+"
-            for (i=0,i<l.length,i++){
-            l[i] = l[i]*-1
+            for (let i = 0; i < l.length; i++) {
+                l[i] = l[i] * -1;
             }
+
             }
             znak.innerText = s;
         });
@@ -145,6 +147,7 @@
 </body>
     
 </html>
+
 
 
 
