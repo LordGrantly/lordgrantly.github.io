@@ -96,18 +96,18 @@
             
         });
         green.addEventListener('click', () => {
-            g = m+g;
+            g = (m+g)*;
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
 
         });
         blue.addEventListener('click', () => {
-            b = m +b;
+            b = m+b;
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
 
             
         });
         alpha.addEventListener('click', () => {
-            a ++;
+            a = a+1/10;
             bg.style.background = `rgba(${r}, ${g}, ${b}, ${a})`;
 
             
@@ -122,14 +122,16 @@
             
         });
         znak.addEventListener('click', () => {
-            if (s==0){
-            znak.innerText = "-";
-            s=1
+            if (znak.innerText=="+"){
+            
+            s="-"
+            
             }
-            if (s==1){
-            znak.innerText = "+";
-            s=0
+            if (znak.innerText =="-"){
+            
+            s="+"
             }
+            znak.innerText = s;
         });
     </script>
 
@@ -138,6 +140,7 @@
 </body>
     
 </html>
+
 
 
 
