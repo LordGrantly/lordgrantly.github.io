@@ -52,7 +52,7 @@
         chciałbym być imformatykiem ponieważ komputery są fajne i lubie pracować z komputerami ponieaż na kompoterach można wielae zdziałać
     </ul>
         <p id="pe">You have not pressed the button yet </p>
-    
+    <button id="button">button</button>
     <br><br><br>
     <div class="button-container">
     <button id="znak">+</button>
@@ -61,7 +61,7 @@
     <button id="green">green</button>
     <button id="blue">blue</button>
     <button id="alpha">alpha</button>
-    <button id="button">button</button>
+    
     </div>
     </div>
     
@@ -99,7 +99,9 @@
             x++;
              pe.textContent="You have pressed the button "+x+" times";
             const rect = button.getBoundingClientRect();
-            console.log('asdasdasd' + rect.height);
+            console.log(rect.right);
+            console.log(rect.left);
+            console.log(rect.height);
             console.log(rect.length);
         });
         red.addEventListener('click', () => {
@@ -184,6 +186,7 @@
 </body>
     
 </html>
+
 
 
 
