@@ -20,8 +20,11 @@
       display: flex;
       gap: 10px; 
     }
-
-
+    .my-button {
+        position: 100px,100px;
+        display: block;
+        background: rgba(200,50,0,0.8);
+    }
 
 
 
@@ -52,7 +55,9 @@
         chciałbym być imformatykiem ponieważ komputery są fajne i lubie pracować z komputerami ponieaż na kompoterach można wielae zdziałać
     </ul>
         <p id="pe">You have not pressed the button yet </p>
+    <div class="my-button" id="button">
     <button id="button">button</button>
+    </div>
     <br><br><br>
     <div class="button-container">
     <button id="znak">+</button>
@@ -102,7 +107,7 @@
             console.log(rect.right);
             console.log(rect.left);
             console.log(rect.height);
-            console.log(rect.length);
+            
         });
         red.addEventListener('click', () => {
             r = m+r;
@@ -186,6 +191,7 @@
 </body>
     
 </html>
+
 
 
 
