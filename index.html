@@ -97,7 +97,7 @@
         button.addEventListener('click', () => {
             x++;
              pe.textContent="You have pressed the button "+x+" times";
-            const rect = button.getBoundingByRect();
+            const rect = button.getBoundingClientRect();
             console.log(rect.height);
             console.log(rect.length);
         });
@@ -183,6 +183,7 @@
 </body>
     
 </html>
+
 
 
 
