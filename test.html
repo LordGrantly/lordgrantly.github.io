@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
+    #teleportBtn {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <button id="teleportBtn">Teleport Me!</button>
+  </div>
+
+  <script>
+    const btn = document.getElementById('teleportBtn');
+    const container = document.getElementById('container');
+
+    btn.addEventListener('click', function() {
+      // Get container and button dimensions
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+
+      // Calculate maximum possible left/top values
+      const maxLeft = container.clientWidth - btn.offsetWidth;
+      const maxTop = container.clientHeight - btn.offsetHeight;
+
+      // Generate random position
+      const randomLeft = Math.floor(Math.random() * maxLeft);
+      const randomTop = Math.floor(Math.random() * maxTop);
+
+      // Set new position
+      btn.style.left = randomLeft + 'px';
+      btn.style.top = randomTop + 'px';
+    });
+  </script>
+</body>
+</html>
