@@ -116,19 +116,19 @@
             x++;
              pe.textContent="You have pressed the button "+x+" times";
             const rect = button.getBoundingClientRect();
-            const btnRect = btn.getBoundingClientRect();
+            const btnRect = button.getBoundingClientRect();
 
           
-          const maxLeft = container.clientWidth - btn.offsetWidth;
-          const maxTop = container.clientHeight - btn.offsetHeight;
+          const maxLeft = container.clientWidth - button.offsetWidth;
+          const maxTop = container.clientHeight - button.offsetHeight;
 
           
           const randomLeft = Math.floor(Math.random() * maxLeft);
           const randomTop = Math.floor(Math.random() * maxTop);
 
           
-          btn.style.left = randomLeft + 'px';
-          btn.style.top = randomTop + 'px';
+          button.style.left = randomLeft + 'px';
+          button.style.top = randomTop + 'px';
             
         });
         red.addEventListener('click', () => {
@@ -213,6 +213,7 @@
 </body>
     
 </html>
+
 
 
 
