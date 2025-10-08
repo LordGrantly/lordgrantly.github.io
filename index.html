@@ -5,7 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-
+    #teleportBtn {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    #container {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      border: 1px solid #ccc;
+      overflow: hidden;
+    }
      .modal-overlay {
       display: block;
       position: fixed;
@@ -56,7 +67,7 @@
         chciałbym być imformatykiem ponieważ komputery są fajne i lubie pracować z komputerami ponieaż na kompoterach można wielae zdziałać
     </ul>
         <p id="pe">You have not pressed the button yet </p>
-    <div class="my-button" id="button">
+    <div class="container" id="button">
     <button style="width: 200px; height: 100px;"id="button">button</button>
     </div>
     <br><br><br>
@@ -105,9 +116,19 @@
             x++;
              pe.textContent="You have pressed the button "+x+" times";
             const rect = button.getBoundingClientRect();
-            console.log(rect.right);
-            console.log(rect.left);
-            console.log(rect.height);
+            const btnRect = btn.getBoundingClientRect();
+
+          
+          const maxLeft = container.clientWidth - btn.offsetWidth;
+          const maxTop = container.clientHeight - btn.offsetHeight;
+
+          
+          const randomLeft = Math.floor(Math.random() * maxLeft);
+          const randomTop = Math.floor(Math.random() * maxTop);
+
+          
+          btn.style.left = randomLeft + 'px';
+          btn.style.top = randomTop + 'px';
             
         });
         red.addEventListener('click', () => {
@@ -192,6 +213,7 @@
 </body>
     
 </html>
+
 
 
 
