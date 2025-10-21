@@ -5,36 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-
-     
-
-
-
-
-
-
-        
+        #button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 400px;
+            height: 200px;
+            background-color: rgb(123, 224, 241);
+            
+        }
+        #container {
+            position: relative;
+            width: 950px;
+            height: 800px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            left: 23%;
+        }
+        .redElement {
+            position: absolute;
+            width: 100px;
+            height: 10px;
+            background-color: red;
+            transform-origin: center;
+        }
     </style>
 </head>
 <body>
-    
-    
-    
-    
-
-    
-    
-</body>
-    
+    <h2 id="pe">You have not pressed the button yet</h2>
+    <h3 id="hs">high score = 0</h3>
+    <div id="container">
+        <div id="redElement" class="redElement"></div>
+        <button id="button">button</button>
+    </div>
     <script>
-        
-        
-  
+        let y = 0;
+        let hs = 0;
+        let x = 0;
+        let timer = 15;
+        let interval;
+        const button = document.getElementById('button')
+        const container = document.getElementById('container');
+        const pe = document.getElementById("pe");
+        document.getElementById('redElement').style.display = 'none';
+
+        function calculateAngle(x1, y1, x2, y2) {
+            return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+        }
+        function startTimer() {
+    // Clear any existing interval to avoid multiple timers
+    clearInterval(interval);
+
+    // Reset the timer to 15 seconds
+    timer = 15;
+
+    // Update the button text immediately
+    button.textContent = `Timer: ${timer}s`;
+
+    // Start the countdown
+    interval = setInterval(() => {
+        timer--;
+        button.textContent = `Timer: ${timer}s`;
+
+        // Stop the timer when it reaches 0
+        if (timer <= 0) {
+            clearInterval(interval);
+            startTimer();
+            x= 0;
+            y++;
+            pe.textContent = "You have pressed the button " + x + " times";
+            if (y != 0 ){
+                button.style.width = "100px";
+                button.style.height = "50px";
+
+            }
+            // Remove all dynamically created newRedElement copies
+            const redElements = document.querySelectorAll('.redElement');
+            redElements.forEach((element) => {
+                element.remove();
+            });
+        }
+    }, 1000); // Update every second
+}
+
+button.addEventListener('click', () => {
+    x++;
+    if (x > hs) {
+        hs = x;
+        document.getElementById("hs").textContent = "high score = " + hs;
+    }
+    
+    pe.textContent = "You have pressed the button " + x + " times";
+
+    // Reset and start the timer
+    startTimer();
+
+    // Get the container's dimensions
+    const maxLeft = container.clientWidth - button.offsetWidth;
+    const maxTop = container.clientHeight - button.offsetHeight;
+
+    // Move the button to a random position
+    const randomLeft = Math.floor(Math.random() * maxLeft);
+    const randomTop = Math.floor(Math.random() * maxTop);
+    button.style.left = randomLeft + 'px';
+    button.style.top = randomTop + 'px';
+
+    // Create a copy of the redElement
+    const newRedElement = document.createElement('div');
+    newRedElement.className = 'redElement'; // Assign the same class for styling
+    newRedElement.style.position = 'absolute';
+    newRedElement.style.width = '100px';
+    newRedElement.style.height = '10px';
+    newRedElement.style.backgroundColor = 'red';
+    newRedElement.style.transformOrigin = 'center';
+
+    // Place the new red element at a random position within the container
+    const redMaxLeft = container.clientWidth - parseInt(newRedElement.style.width);
+    const redMaxTop = container.clientHeight - parseInt(newRedElement.style.height);
+    const redRandomLeft = Math.floor(Math.random() * redMaxLeft);
+    const redRandomTop = Math.floor(Math.random() * redMaxTop);
+    newRedElement.style.left = redRandomLeft + 'px';
+    newRedElement.style.top = redRandomTop + 'px';
+
+    // Append the new red element to the container
+    container.appendChild(newRedElement);
+
+    // Add mousemove event listener to rotate the new red element
+    container.addEventListener('mousemove', (event) => {
+        const containerRect = container.getBoundingClientRect();
+        const newRedElementRect = newRedElement.getBoundingClientRect();
+
+        // Get the center of the new red element
+        const newRedCenterX = newRedElementRect.left + newRedElementRect.width / 2;
+        const newRedCenterY = newRedElementRect.top + newRedElementRect.height / 2;
+
+        // Get the cursor position relative to the container
+        const cursorX = event.clientX ;
+        const cursorY = event.clientY ;
+
+        // Calculate the angle and rotate the new red element
+        const angle = calculateAngle(newRedCenterX, newRedCenterY, cursorX, cursorY);
+        newRedElement.style.transform = `rotate(${angle}deg)`;
+    });
+});
+        startTimer();
     </script>
-
-    
-    
 </body>
-    
 </html>
-
