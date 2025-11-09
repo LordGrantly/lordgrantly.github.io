@@ -21,7 +21,7 @@
   <canvas id="mycanvas"></canvas>
 
   <script>
-    function startTimer() {
+    function setCanvas() {
       const canvas = document.getElementById('mycanvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
@@ -55,8 +55,8 @@
             newEnemy.style.height = '40px';
             newEnemy.style.backgroundColor  = 'red';
             newEnemy.style.border = '5px';
-            newEnemy.style.left = cross.x + 'px';
-            newEnemy.style.right = cross.y + 'px';
+            newEnemy.style.left = crosses.x+ 'px';
+            newEnemy.style.right = crosses.y + 'px';
                 
             crosses.splice(i, 1);
               
@@ -82,7 +82,7 @@
       draw(); // start animation loop
     }
 
-    startTimer();
+    setCanvas();
   </script>
 </body>
 
