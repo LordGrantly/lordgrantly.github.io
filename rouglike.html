@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+            height: 60px;
+            background-color: rgb(123, 224, 241);
+            
+        }
+        #container {
+            position: relative;
+            width: 950px;
+            height: 800px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            left: 23%;
+        }
+        .x-bar {
+  width: 2px;
+  height: 32px;
+  background: black;
+  position: absolute;
+  top: 0;
+  left: 15px;
+}
+.x-left { transform: rotate(45deg);}
+.x-right { transform: rotate(-45deg);}
+    </style>
+</head>
+<body>
+  <div class="x-bar x-left"></div>
+    
+    
+    <script>
+       
+        function startTimer() {
+    // Clear any existing interval to avoid multiple timers
+    clearInterval(interval);
+
+    // Reset the timer to 15 seconds
+    timer = 15;
+
+    // Update the button text immediately
+    button.textContent = `Timer: ${timer}s`;
+
+    // Start the countdown
+    interval = setInterval(() => {
+        timer--;
+        button.textContent = `Timer: ${timer}s`;
+
+        // Stop the timer when it reaches 0
+        if (timer <= 0) {
+            clearInterval(interval);
+            startTimer();
+            x= 0;
+            y++;
+            pe.textContent = "You have pressed the button " + x + " times";
+            if (y != 0 ){
+                
+
+            }
+            // Remove all dynamically created newRedElement copies
+            const redElements = document.querySelectorAll('.redElement');
+            redElements.forEach((element) => {
+                element.remove();
+            });
+        }
+    }, 1000); // Update every second
+}
+
+ 
+    </script>
+</body>
+</html>
