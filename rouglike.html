@@ -50,16 +50,22 @@
         // Remove expired crosses
         for (let i = crosses.length - 1; i >= 0; i--) {
           if (now - crosses[i].created > lifetime) {
+            const cross = crosses[i];
+
+            // Create a new enemy div at the same position
             const newEnemy = document.createElement('div');
             newEnemy.style.width = '40px';
             newEnemy.style.height = '40px';
-            newEnemy.style.backgroundColor  = 'red';
-            newEnemy.style.border = '5px';
-            newEnemy.style.left = crosses.x+ 'px';
-            newEnemy.style.right = crosses.y + 'px';
-                
+            newEnemy.style.backgroundColor = 'red';
+            newEnemy.style.border = '5px solid black';
+            newEnemy.style.position = 'absolute';
+            newEnemy.style.left = cross.x + 'px';
+            newEnemy.style.top = cross.y + 'px';
+
+            document.body.appendChild(newEnemy);
+
+            // Remove the expired cross
             crosses.splice(i, 1);
-              
           }
         }
 
