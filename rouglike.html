@@ -22,58 +22,52 @@
             overflow: hidden;
             left: 23%;
         }
-        .x-bar {
-  width: 2px;
-  height: 32px;
-  background: black;
-  position: absolute;
-  top: 0;
-  left: 15px;
-}
-.x-left { transform: rotate(45deg);}
-.x-right { transform: rotate(-45deg);}
+        
     </style>
 </head>
 <body>
-  <div class="x-bar x-left"></div>
-    
+  
+      <canvas id="mycanvas" width="32" height="32"></canvas>
     
     <script>
        
         function startTimer() {
     // Clear any existing interval to avoid multiple timers
     clearInterval(interval);
+    const ctx = document.getElementById('mycanvas').getContext('2d');
+    const maxLeft = window.innerWidth - ctx.width;
+    const maxTop = window.innerHeight - ctx.height;
 
-    // Reset the timer to 15 seconds
-    timer = 15;
 
-    // Update the button text immediately
-    button.textContent = `Timer: ${timer}s`;
 
-    // Start the countdown
-    interval = setInterval(() => {
-        timer--;
-        button.textContent = `Timer: ${timer}s`;
+    
+    const randomLeft = Math.floor(Math.random() * maxLeft);
+    const randomTop = Math.floor(Math.random() * maxTop);
+  
 
-        // Stop the timer when it reaches 0
-        if (timer <= 0) {
-            clearInterval(interval);
-            startTimer();
-            x= 0;
-            y++;
-            pe.textContent = "You have pressed the button " + x + " times";
-            if (y != 0 ){
-                
+    
 
-            }
-            // Remove all dynamically created newRedElement copies
-            const redElements = document.querySelectorAll('.redElement');
-            redElements.forEach((element) => {
-                element.remove();
+ctx.strokeStyle = 'red';
+ctx.lineWidth = 2;
+ctx.beginPath();
+ctx.moveTo(randomLeft, randomTop);
+ctx.lineTo(randomLeft+32,randomTop+32);
+ctx.moveTo(randomLeft+32, randomTop);
+ctx.lineTo(randomLeft, randomTop+32);
+ctx.stroke();
+</script>
+    
+
+    
+
+    
+
+        
             });
         }
     }, 1000); // Update every second
 }
+    startTimer();
 
  
     </script>
