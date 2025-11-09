@@ -23,8 +23,8 @@
       const lifetime = 5000; // 5 seconds
 
       function addCross() {
-        const maxLeft = canvas.width - 32;
-        const maxTop = canvas.height - 32;
+        const maxLeft = canvas.width - 70;
+        const maxTop = canvas.height - 70;
         const randomLeft = Math.floor(Math.random() * maxLeft);
         const randomTop = Math.floor(Math.random() * maxTop);
 
@@ -48,7 +48,7 @@
 
         // Draw active crosses
         ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 4;
         crosses.forEach(cross => {
           ctx.beginPath();
           ctx.moveTo(cross.x, cross.y);
