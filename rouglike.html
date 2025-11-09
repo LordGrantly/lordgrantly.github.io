@@ -10,20 +10,21 @@
     </style>
 </head>
 <body>
-  <canvas id="mycanvas" width="32" height="32"></canvas>
+  <canvas id="mycanvas"></canvas>
 
   <script>
     function startTimer() {
       const canvas = document.getElementById('mycanvas');
       const ctx = canvas.getContext('2d');
 
-      // Run every second
-      setInterval(() => {
-        
+      // Make canvas fill the window
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-        // Get random position within window bounds
-        const maxLeft = window.innerWidth - canvas.width;
-        const maxTop = window.innerHeight - canvas.height;
+      setInterval(() => {
+        // Pick random position inside canvas
+        const maxLeft = canvas.width - 32;
+        const maxTop = canvas.height - 32;
         const randomLeft = Math.floor(Math.random() * maxLeft);
         const randomTop = Math.floor(Math.random() * maxTop);
 
@@ -42,5 +43,6 @@
     startTimer();
   </script>
 </body>
+
 
 </html>
