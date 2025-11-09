@@ -26,62 +26,38 @@
     </style>
 </head>
 <body>
-  
-      <canvas id="mycanvas" width="32" height="32"></canvas>
-    
-    <script>
-       
+  <canvas id="mycanvas" width="32" height="32"></canvas>
 
+  <script>
+    function startTimer() {
+      const canvas = document.getElementById('mycanvas');
+      const ctx = canvas.getContext('2d');
 
-        function startTimer() {
+      // Run every second
+      setInterval(() => {
+        // Clear previous drawings
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    
-    const ctx = document.getElementById('mycanvas').getContext('2d');
-    const maxLeft = window.innerWidth - ctx.width;
-    const maxTop = window.innerHeight - ctx.height;
+        // Get random position within window bounds
+        const maxLeft = window.innerWidth - canvas.width;
+        const maxTop = window.innerHeight - canvas.height;
+        const randomLeft = Math.floor(Math.random() * maxLeft);
+        const randomTop = Math.floor(Math.random() * maxTop);
 
-
-
-    
-    const randomLeft = Math.floor(Math.random() * maxLeft);
-    const randomTop = Math.floor(Math.random() * maxTop);
-  
-
-    
-    
-        setInterval(() => {
-  
-        
+        // Draw red X
         ctx.strokeStyle = 'red';
-ctx.lineWidth = 2;
-ctx.beginPath();
-ctx.moveTo(int(randomLeft), int(randomTop));
-ctx.lineTo(int(randomLeft)+32,int(randomTop)+32);
-ctx.moveTo(int(randomLeft)+32, int(randomTop));
-ctx.lineTo(int(randomLeft), int(randomTop)+32);
-ctx.stroke();
-
-        
-            
-        
-}, 1000); 
-
-
-        };
-    
-
-    
-
-    
-
-        
-       
-        
-
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(randomLeft, randomTop);
+        ctx.lineTo(randomLeft + 32, randomTop + 32);
+        ctx.moveTo(randomLeft + 32, randomTop);
+        ctx.lineTo(randomLeft, randomTop + 32);
+        ctx.stroke();
+      }, 1000);
+    }
 
     startTimer();
-
- 
-    </script>
+  </script>
 </body>
+
 </html>
