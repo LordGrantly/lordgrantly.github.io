@@ -14,33 +14,58 @@
 
   <script>
     function startTimer() {
+        
       const canvas = document.getElementById('mycanvas');
       const ctx = canvas.getContext('2d');
+      const crosses = [];
+      const lifetime = 5000;  
+      
+      
 
-      // Make canvas fill the window
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      setInterval(() => {
-        // Pick random position inside canvas
+      function addCross(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         const maxLeft = canvas.width - 32;
         const maxTop = canvas.height - 32;
         const randomLeft = Math.floor(Math.random() * maxLeft);
         const randomTop = Math.floor(Math.random() * maxTop);
 
-        // Draw red X
+          crosses.push({
+              x: randomLeft;
+              y: randomTop;
+              created: Date.now;
+      });
+          
+      };
+        function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+        const now = Date.now;
+        for (let i = crosses.length - 1 ;i >= 0; i--){
+            if(now - crosses[i].created > lifetime){
+                crosses.splice(i,1);
+
+
+            };
+            
+
+
+        };
+           
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
+        crosses.forEach(cross =>{
         ctx.beginPath();
         ctx.moveTo(randomLeft, randomTop);
         ctx.lineTo(randomLeft + 32, randomTop + 32);
         ctx.moveTo(randomLeft + 32, randomTop);
         ctx.lineTo(randomLeft, randomTop + 32);
         ctx.stroke();
-      }, 1000);
-    }
+      });
+      reqestAmimaionFrame(draw);
+    }; 
+      setInterval(addCross,1000);
+      draw();
 
-    startTimer();
   </script>
 </body>
 
