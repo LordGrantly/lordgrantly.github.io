@@ -30,10 +30,12 @@
       <canvas id="mycanvas" width="32" height="32"></canvas>
     
     <script>
-       let interval;
+       
+
+
         function startTimer() {
     // Clear any existing interval to avoid multiple timers
-    clearInterval(interval);
+    
     const ctx = document.getElementById('mycanvas').getContext('2d');
     const maxLeft = window.innerWidth - ctx.width;
     const maxTop = window.innerHeight - ctx.height;
@@ -46,8 +48,9 @@
   
 
     
-    interval = setInterval(() => {
-        
+    
+        setInterval(() => {
+  
         
         ctx.strokeStyle = 'red';
 ctx.lineWidth = 2;
@@ -61,7 +64,8 @@ ctx.stroke();
         
             
         
-    }, 1000);
+}, 1000); 
+
 
         };
     
