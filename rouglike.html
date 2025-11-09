@@ -17,14 +17,15 @@
         
       const canvas = document.getElementById('mycanvas');
       const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       const crosses = [];
       const lifetime = 5000;  
       
       
 
       function addCross(){
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        
         const maxLeft = canvas.width - 32;
         const maxTop = canvas.height - 32;
         const randomLeft = Math.floor(Math.random() * maxLeft);
