@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #Enemy{
+            width : 40px ;
+            height : 40px ;
+            background-color : 'red';
+            border-color : black;
+            border: 5px;
+            
+           
+        }
+        
+    </style>
+</head>
+<body>
+  <canvas id="mycanvas"></canvas>
+
+  <script>
+    function setCanvas() {
+      const canvas = document.getElementById('mycanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+      const crosses = [];
+      const lifetime = 5000; // 5 seconds
+
+      function addCross() {
+        const maxLeft = canvas.width - 70;
+        const maxTop = canvas.height - 70;
+        const randomLeft = Math.floor(Math.random() * maxLeft);
+        const randomTop = Math.floor(Math.random() * maxTop);
+
+        crosses.push({
+          x: randomLeft,
+          y: randomTop,
+          created: Date.now()
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const now = Date.now();
+        const Enemys = [];
+
+        // Remove expired crosses
+        for (let i = crosses.length - 1; i >= 0; i--) {
+          if (now - crosses[i].created > lifetime) {
+            const cross = crosses[i];
+
+            // Create a new enemy div at the same position
+            const newEnemy = document.createElement('div');
+            newEnemy.style.width = '40px';
+            newEnemy.style.height = '40px';
+            newEnemy.style.backgroundColor = 'red';
+            newEnemy.style.border = '5px solid black';
+            newEnemy.style.position = 'absolute';
+            newEnemy.style.left = cross.x + 'px';
+            newEnemy.style.top = cross.y + 'px';
+            
+            document.body.appendChild(newEnemy);
+            Enemys.push{
+              x: cross.x,
+              y: cross.y,
+              backgroundColor:'black',
+                           
+            }
+            // Remove the expired cross
+            crosses.splice(i, 1);
+          }
+        }
+
+        // Draw active crosses
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 4;
+        crosses.forEach(cross => {
+          ctx.beginPath();
+          ctx.moveTo(cross.x, cross.y);
+          ctx.lineTo(cross.x + 32, cross.y + 32);
+          ctx.moveTo(cross.x + 32, cross.y);
+          ctx.lineTo(cross.x, cross.y + 32);
+          ctx.stroke();
+        });
+
+        requestAnimationFrame(draw);
+      }
+      newEnemy.addEventListener( 'click' , () =>{
+        const cursorX = event.clientX ;
+        const cursorY = event.clientY ;
+        
+          for (let i = Enemys.length - 1;i>=0;i--){
+            const Enemy = Enemys[i];
+            if (cursorX = Enemy.x && cursor.Y = Enemy.y){
+              
+              
+            }
+          }
+
+        
+                                });
+
+      setInterval(addCross, 1000); // add new cross every second
+      draw(); // start animation loop
+    }
+
+    setCanvas();
+  </script>
+</body>
+
+
+
+</html>
