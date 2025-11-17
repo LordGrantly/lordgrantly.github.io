@@ -21,64 +21,84 @@
   <canvas id="mycanvas"></canvas>
 
   <script>
-    function setCanvas() {
-      const canvas = document.getElementById('mycanvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-        return canvas;
-    }
-      const crosses = [];
-      const lifetime = 5000; // 5 seconds
+    let canvas, ctx;
+const crosses = [];
+const enemies = []; // store enemy objects
+const lifetime = 5000; // 5 seconds
 
-      function addCross() {
-        const maxLeft = canvas.width - 70;
-        const maxTop = canvas.height - 70;
-        const randomLeft = Math.floor(Math.random() * maxLeft);
-        const randomTop = Math.floor(Math.random() * maxTop);
+function setCanvas() {
+    canvas = document.getElementById('mycanvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    return canvas;
+}
 
-        crosses.push({
-          x: randomLeft,
-          y: randomTop,
-          created: Date.now()
-        });
-      }
+function addCross() {
+    const maxLeft = canvas.width - 70;
+    const maxTop = canvas.height - 70;
+    const randomLeft = Math.floor(Math.random() * maxLeft);
+    const randomTop = Math.floor(Math.random() * maxTop);
 
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const now = Date.now();
-        const Enemys = [];
+    crosses.push({
+        x: randomLeft,
+        y: randomTop,
+        created: Date.now()
+    });
+}
 
-        // Remove expired crosses
-        for (let i = crosses.length - 1; i >= 0; i--) {
-          if (now - crosses[i].created > lifetime) {
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const now = Date.now();
+
+    for (let i = crosses.length - 1; i >= 0; i--) {
+        if (now - crosses[i].created > lifetime) {
             const cross = crosses[i];
 
-            // Create a new enemy div at the same position
-            const newEnemy = document.createElement('div');
-            newEnemy.style.width = '40px';
-            newEnemy.style.height = '40px';
-            newEnemy.style.backgroundColor = 'red';
-            newEnemy.style.border = '5px solid black';
-            newEnemy.style.position = 'absolute';
-            newEnemy.style.left = cross.x + 'px';
-            newEnemy.style.top = cross.y + 'px';
-            
-            document.body.appendChild(newEnemy);
-            newEnemy.addEventListener( 'click' , () =>{
-        const cursorX = event.clientX ;
-        const cursorY = event.clientY ;
-        
-          for (let i = Enemys.length - 1;i>=0;i--){
-            const Enemy = Enemys[i];
-            if (cursorX == Enemy.x && cursorY == Enemy.y){
-              console.log("U clicked an enemy");
-              
-            }
-          }
+            // create enemy div
+            const enemyDiv = document.createElement('div');
+            enemyDiv.style.width = '40px';
+            enemyDiv.style.height = '40px';
+            enemyDiv.style.backgroundColor = 'red';
+            enemyDiv.style.border = '5px solid black';
+            enemyDiv.style.position = 'absolute';
+            enemyDiv.style.left = cross.x + 'px';
+            enemyDiv.style.top = cross.y + 'px';
 
-        
-                                });
+            document.body.appendChild(enemyDiv);
+
+            // store enemy object
+            const enemyObj = {
+                x: cross.x,
+                y: cross.y,
+                w: 40,
+                h: 40,
+                element: enemyDiv
+            };
+            enemies.push(enemyObj);
+
+            enemyDiv.addEventListener('click', (event) => {
+                const cx = event.clientX;
+                const cy = event.clientY;
+
+                
+                if (
+                    cx >= enemyObj.x &&
+                    cx <= enemyObj.x + enemyObj.w &&
+                    cy >= enemyObj.y &&
+                    cy <= enemyObj.y + enemyObj.h
+                ) {
+                    console.log("You clicked an enemy!");
+                }
+            });
+
+            crosses.splice(i, 1);
+        }
+    }
+
+    requestAnimationFrame(draw);
+}
+
             Enemys.push({
               x: cross.x,
               y: cross.y,
