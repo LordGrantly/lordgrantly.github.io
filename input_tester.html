@@ -64,6 +64,20 @@
             newEnemy.style.top = cross.y + 'px';
             
             document.body.appendChild(newEnemy);
+            newEnemy.addEventListener( 'click' , () =>{
+        const cursorX = event.clientX ;
+        const cursorY = event.clientY ;
+        
+          for (let i = Enemys.length - 1;i>=0;i--){
+            const Enemy = Enemys[i];
+            if (cursorX == Enemy.x && cursorY == Enemy.y){
+              console.log("U clicked an enemy");
+              
+            }
+          }
+
+        
+                                });
             Enemys.push({
               x: cross.x,
               y: cross.y,
@@ -89,20 +103,7 @@
 
         requestAnimationFrame(draw);
       }
-      newEnemy.addEventListener( 'click' , () =>{
-        const cursorX = event.clientX ;
-        const cursorY = event.clientY ;
-        
-          for (let i = Enemys.length - 1;i>=0;i--){
-            const Enemy = Enemys[i];
-            if (cursorX == Enemy.x && cursorY == Enemy.y){
-              console.log("U clicked an enemy");
-              
-            }
-          }
-
-        
-                                });
+      
 
       setInterval(addCross, 1000); // add new cross every second
       draw(); // start animation loop
