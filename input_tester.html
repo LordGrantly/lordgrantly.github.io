@@ -48,19 +48,36 @@ function draw() {
     const now = Date.now();
     const cursorX = event.clientX - canvas.x;
     const cursorY = event.clientY - canvas.y;
-    // 1) TURN OLD CROSSES INTO ENEMIES
-    for (let i = crosses.length - 1; i >= 0; i--) {
-        const cross = crosses[i];
-        if (now - cross.created > lifetime) {
 
-            const div = document.createElement("div");
-            div.className = "enemy";
-            div.style.left = cross.x + "px";
-            div.style.top = cross.y + "px";
 
-            document.body.appendChild(div);
+           
 
-            enemies.push({
+           
+
+            
+
+for (let i = crosses.length - 1; i >= 0; i--) {
+    const cross = crosses[i];
+    if (now - cross.created > lifetime) {
+
+        const div = document.createElement("div");
+        div.className = "enemy";
+        div.style.left = cross.x + "px";
+        div.style.top = cross.y + "px";
+
+        document.body.appendChild(div);
+
+        const enemy = {
+            x: cross.x,
+            y: cross.y,
+            w: 40,
+            h: 40,
+            element: div,
+            background: 'red'
+        };
+
+        enemies.push(enemy);
+        enemies.push({
                 x: cross.x,
                 y: cross.y,
                 w: 40,
@@ -69,27 +86,16 @@ function draw() {
                 background: 'red'
             });
 
-            div.addEventListener("click", () => {
-              let i = -1;
-              
-              enemies.forEach(enemon =>{
-                
-                if (enemon.x == cursorX && enemon.y == cursorY){
-                i++;
-                enemies[i] = 'green';  
-                newEnemy.style.backgroundColor = 'green';
+        div.addEventListener("click", () => {
+            enemy.background = "green";
+            div.style.backgroundColor = "green";
+            console.log("Enemy turned green!");
+        });
 
-                }
-                
-
-                
-              });
-                console.log("You clicked an enemy!");
-            });
-
-            crosses.splice(i, 1);
-        }
+        crosses.splice(i, 1);
     }
+}
+
 
 
     ctx.strokeStyle = "red";
