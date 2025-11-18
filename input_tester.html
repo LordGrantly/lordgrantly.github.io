@@ -46,61 +46,43 @@ function addCross() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const now = Date.now();
-    const cursorX = event.clientX - canvas.x;
-    const cursorY = event.clientY - canvas.y;
 
+    // Turn crosses into enemies
+    for (let i = crosses.length - 1; i >= 0; i--) {
+        const cross = crosses[i];
+        if (now - cross.created > lifetime) {
 
-           
+            const div = document.createElement("div");
+            div.className = "enemy";
+            div.style.left = cross.x + "px";
+            div.style.top = cross.y + "px";
+            document.body.appendChild(div);
 
-           
-
-            
-
-for (let i = crosses.length - 1; i >= 0; i--) {
-    const cross = crosses[i];
-    if (now - cross.created > lifetime) {
-
-        const div = document.createElement("div");
-        div.className = "enemy";
-        div.style.left = cross.x + "px";
-        div.style.top = cross.y + "px";
-
-        document.body.appendChild(div);
-
-        const enemy = {
-            x: cross.x,
-            y: cross.y,
-            w: 40,
-            h: 40,
-            element: div,
-            background: 'red'
-        };
-
-        enemies.push(enemy);
-        enemies.push({
+            const enemy = {
                 x: cross.x,
                 y: cross.y,
                 w: 40,
                 h: 40,
                 element: div,
                 background: 'red'
+            };
+
+            enemies.push(enemy);
+
+
+            div.addEventListener("click", () => {
+                enemy.background = "green";
+                div.style.backgroundColor = "green";
+                console.log("Enemy turned green!");
             });
 
-        div.addEventListener("click", () => {
-            enemy.background = "green";
-            div.style.backgroundColor = "green";
-            console.log("Enemy turned green!");
-        });
-
-        crosses.splice(i, 1);
+            crosses.splice(i, 1);
+        }
     }
-}
-
 
 
     ctx.strokeStyle = "red";
     ctx.lineWidth = 4;
-
     crosses.forEach(cross => {
         ctx.beginPath();
         ctx.moveTo(cross.x, cross.y);
@@ -112,7 +94,6 @@ for (let i = crosses.length - 1; i >= 0; i--) {
 
     requestAnimationFrame(draw);
 }
-
 
 setCanvas();
 setInterval(addCross, 1000);
