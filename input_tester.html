@@ -46,7 +46,8 @@ function addCross() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const now = Date.now();
-
+    const cursorX = event.clientX ;
+    const cursorY = event.clientY ;
     // 1) TURN OLD CROSSES INTO ENEMIES
     for (let i = crosses.length - 1; i >= 0; i--) {
         const cross = crosses[i];
@@ -64,10 +65,25 @@ function draw() {
                 y: cross.y,
                 w: 40,
                 h: 40,
-                element: div
+                element: div,
+                background: 'red'
             });
 
             div.addEventListener("click", () => {
+              let i = -1;
+              
+              enemies.forEach(enemon =>{
+                
+                if (enemon.x == cursorX && enemon.y == cursorY){
+                i++;
+                enemies[i] = 'green';  
+                newEnemy.style.backgroundColor = 'green';
+
+                }
+                
+
+                
+              });
                 console.log("You clicked an enemy!");
             });
 
