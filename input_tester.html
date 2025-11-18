@@ -46,8 +46,8 @@ function addCross() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const now = Date.now();
-    const cursorX = event.clientX ;
-    const cursorY = event.clientY ;
+    const cursorX = event.clientX - canvas.x;
+    const cursorY = event.clientY - canvas.y;
     // 1) TURN OLD CROSSES INTO ENEMIES
     for (let i = crosses.length - 1; i >= 0; i--) {
         const cross = crosses[i];
