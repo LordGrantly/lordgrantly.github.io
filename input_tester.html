@@ -6,6 +6,14 @@
 <title>Our Version</title>
 
 <style>
+  #sqare{
+    width: 250px;
+    height: 250px;
+    background-color: rgba(0,0,100,0.6);
+    border: 5px solid black;
+    
+    
+  }
   .enemy {
     width: 40px;
     height: 40px;
@@ -17,6 +25,8 @@
 </head>
 
 <body>
+<div id="square"></div>
+  
 <canvas id="mycanvas"></canvas>
 
 <script>
@@ -44,6 +54,7 @@ function addCross() {
 }
 
 function draw() {
+    const sqare=document.getElementById("sqare");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const now = Date.now();
 
@@ -71,6 +82,8 @@ function draw() {
 
 
             div.addEventListener("click", () => {
+                sqare.style.x = div.style.x;
+                sqare.style.y = div.style.y;
                 enemy.background = "green";
                 div.style.backgroundColor = "green";
                 
