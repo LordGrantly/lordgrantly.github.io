@@ -97,8 +97,11 @@ function draw() {
 
             enemies.push(enemy);
 
-            div.addEventListener("click", () => {
-              square.style.display = "block";
+            div.addEventListener("click", (event) => {
+    event.stopPropagation();     
+    selectedEnemy = div;        
+
+    square.style.display = "block";
 
     const eX = parseInt(div.style.left);
     const eY = parseInt(div.style.top);
@@ -109,7 +112,7 @@ function draw() {
     const eW = div.offsetWidth;
     const eH = div.offsetHeight;
 
-    // center square on enemy
+    // Center square on enemy
     const newX = eX - (sqW - eW) / 2;
     const newY = eY - (sqH - eH) / 2;
 
@@ -118,11 +121,7 @@ function draw() {
 
     div.style.backgroundColor = "green";
 });
-      div.addEventListener("click", (event) => {
-    
-    event.stopPropagation();     
-    selectedEnemy = div;          
-});
+
 
 
 
