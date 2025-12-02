@@ -81,17 +81,26 @@ function draw() {
             enemies.push(enemy);
 
             div.addEventListener("click", () => {
-                let x=div.style.left;
-                let y=div.style.top;
-                let off_x=square.style.width ;
-                let off_y=square.style.heigt ;
-                let off_x2 =  div.style.width;
-                let off_y2 = div.style.heigt;
-                square.style.left = div.style.left+off_x-off_x2;
-                square.style.top = div.style.top+off_y-off_y2;
 
-                div.style.backgroundColor = "green";
-            });
+    const eX = parseInt(div.style.left);
+    const eY = parseInt(div.style.top);
+
+    const sqW = square.offsetWidth;
+    const sqH = square.offsetHeight;
+
+    const eW = div.offsetWidth;
+    const eH = div.offsetHeight;
+
+    // center square on enemy
+    const newX = eX - (sqW - eW) / 2;
+    const newY = eY - (sqH - eH) / 2;
+
+    square.style.left = newX + "px";
+    square.style.top = newY + "px";
+
+    div.style.backgroundColor = "green";
+});
+
 
             crosses.splice(i, 1);
         }
