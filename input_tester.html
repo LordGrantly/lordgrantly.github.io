@@ -97,6 +97,7 @@ function draw() {
             enemies.push(enemy);
 
             div.addEventListener("click", () => {
+              square.style.display = "block";
 
     const eX = parseInt(div.style.left);
     const eY = parseInt(div.style.top);
@@ -117,7 +118,7 @@ function draw() {
     div.style.backgroundColor = "green";
 });
       div.addEventListener("click", (event) => {
-    square.style.display = "block";
+    
     event.stopPropagation();     
     selectedEnemy = div;          
 });
