@@ -31,10 +31,24 @@
 <canvas id="mycanvas"></canvas>
 
 <script>
+let selectedEnemy = null; 
+
 let canvas, ctx;
 const crosses = [];
 const enemies = [];
 const lifetime = 5000;
+square.addEventListener("click", (event) => {
+    if (!selectedEnemy) return;
+
+    const TpX = event.clientX;
+    const TpY = event.clientY;
+
+    const eW = selectedEnemy.offsetWidth;
+    const eH = selectedEnemy.offsetHeight;
+
+    selectedEnemy.style.left = (TpX - eW/2) + "px";
+    selectedEnemy.style.top  = (TpY - eH/2) + "px";
+});
 
 function setCanvas() {
     canvas = document.getElementById("mycanvas");
@@ -100,13 +114,11 @@ function draw() {
 
     div.style.backgroundColor = "green";
 });
-      square.addEventListener("click", () => {
-          let TpX = event.clientX;
-          let TpY = event.clientY;
+      div.addEventListener("click", (event) => {
+    event.stopPropagation();     
+    selectedEnemy = div;          
+});
 
-        div.style.left=TpX +"px"
-        div.style.top=TpY +"px"
-      });
 
 
             crosses.splice(i, 1);
