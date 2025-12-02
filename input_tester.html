@@ -100,6 +100,13 @@ function draw() {
 
     div.style.backgroundColor = "green";
 });
+      square.addEventListener("click", () => {
+          let TpX = event.clientX;
+          let TpY = event.clientY;
+
+        div.style.left=TpX +"px"
+        div.style.top=TpY +"px"
+      });
 
 
             crosses.splice(i, 1);
