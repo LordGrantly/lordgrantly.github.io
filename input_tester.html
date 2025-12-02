@@ -81,9 +81,12 @@ function draw() {
             enemies.push(enemy);
 
             div.addEventListener("click", () => {
-                // Move the square to the enemy
-                square.style.left = div.style.left;
-                square.style.top = div.style.top;
+                let x=div.style.left;
+                let y=div.style.top;
+                let off_x=square.style.width - div.style.width;
+                let off_y=square.style.heigt - div.style.heigt;
+                square.style.left = div.style.left+off_x;
+                square.style.top = div.style.top+off_y;
 
                 div.style.backgroundColor = "green";
             });
