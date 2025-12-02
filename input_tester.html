@@ -38,6 +38,7 @@ const crosses = [];
 const enemies = [];
 const lifetime = 5000;
 square.addEventListener("click", (event) => {
+  
     if (!selectedEnemy) return;
 
     const TpX = event.clientX;
@@ -48,6 +49,7 @@ square.addEventListener("click", (event) => {
 
     selectedEnemy.style.left = (TpX - eW/2) + "px";
     selectedEnemy.style.top  = (TpY - eH/2) + "px";
+    square.style.display = "none";
 });
 
 function setCanvas() {
@@ -115,6 +117,7 @@ function draw() {
     div.style.backgroundColor = "green";
 });
       div.addEventListener("click", (event) => {
+    square.style.display = "block";
     event.stopPropagation();     
     selectedEnemy = div;          
 });
