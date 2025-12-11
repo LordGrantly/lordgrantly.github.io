@@ -1,92 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internal Window Example</title>
-  <style>
-    /* Modal background */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 0, 0, 0.5);
-      z-index: 1000;
-    }
-
-    /* Modal window */
-    .modal-window {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(200,10,200,1);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 255, 0, 0.2);
-      z-index: 1001;
-      width: 300px;
-      text-align: center;
-    }
-
-    /* Close button */
-    .close-btn {
-      background: #f44336;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+            height: 60px;
+            background-color: rgb(123, 224, 241);
+            border:  1px solid black;
+        }
+        #container {
+            position: relative;
+            width: 950px;
+            height: 800px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            left: 23%;
+        }
+        .redElement {
+            position: absolute;
+            width: 1000px;
+            height: 10px;
+            background-color: red;
+            transform-origin: center;
+        }
+    </style>
 </head>
 <body>
-  <button id="openModal">Open Internal Window</button>
-
-  <!-- Modal Structure -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-window">
-      <h2>Internal Window</h2>
-      <p>This is a custom internal window created using JavaScript!</p>
-      
-      <button class="close-btn" id="closeModal">Close</button>
+    <h2 id="pe">You have not pressed the button yet</h2>
+    <h3 id="hs">high score = 0</h3>
+    <div id="container">
+        <div id="redElement" class="redElement"></div>
+        <button id="button">button</button>
     </div>
-  </div>
+    <script>
+        let y = 0;
+        let hs = 0;
+        let x = 0;
+        let timer = 15;
+        let interval;
+        const button = document.getElementById('button')
+        const container = document.getElementById('container');
+        const pe = document.getElementById("pe");
+        document.getElementById('redElement').style.display = 'none';
 
-  <script>
-    // Get elements
-    const openModal = document.getElementById('openModal');
-    const closeModal = document.getElementById('closeModal');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const tekst = document.getElementById('tekst');
-    const przycisk = document.getElementById('przycisk');
-    // Open modal
-    openModal.addEventListener('click', () => {
-      modalOverlay.style.display = 'block';
-    });
+        function calculateAngle(x1, y1, x2, y2) {
+            return Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+        }
+        function startTimer() {
+   
+    clearInterval(interval);
 
-    // Close modal
-    closeModal.addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-    });
+    
+    timer = 15;
 
-    // Close modal when clicking outside the window
-    modalOverlay.addEventListener('click', (event) => {
-      if (event.target === modalOverlay) {
-        modalOverlay.style.display = 'none';
-      }
+    
+    button.textContent = `Timer: ${timer}s`;
+
+    
+    interval = setInterval(() => {
+        timer--;
+        button.textContent = `Timer: ${timer}s`;
+
+       
+        if (timer <= 0) {
+            clearInterval(interval);
+            startTimer();
+            x= 0;
+            y++;
+            pe.textContent = "You have pressed the button " + x + " times";
+            if (y != 0 ){
+                
+            }
+            
+            const redElements = document.querySelectorAll('.redElement');
+            redElements.forEach((element) => {
+                element.remove();
+            });
+        }
+    }, 1000); 
+}
+
+button.addEventListener('click', () => {
+    x++;
+    if (x > hs) {
+        hs = x;
+        document.getElementById("hs").textContent = "high score = " + hs;
+    }
+    
+    pe.textContent = "You have pressed the button " + x + " times";
+
+    
+    startTimer();
+
+    
+    const maxLeft = container.clientWidth - button.offsetWidth;
+    const maxTop = container.clientHeight - button.offsetHeight;
+
+    
+    const randomLeft = Math.floor(Math.random() * maxLeft);
+    const randomTop = Math.floor(Math.random() * maxTop);
+    button.style.left = randomLeft + 'px';
+    button.style.top = randomTop + 'px';
+
+    
+    const newRedElement = document.createElement('div');
+    newRedElement.className = 'redElement';
+    newRedElement.style.position = 'absolute';
+    newRedElement.style.width = '50px';
+    newRedElement.style.height = '1100px';
+    newRedElement.style.backgroundColor = 'red';
+    newRedElement.style.transformOrigin = 'center';
+    newRedElement.style.border = '5px solid black';
+    
+    const redMaxLeft = container.clientWidth - parseInt(newRedElement.style.width);
+    const redMaxTop = container.clientHeight - parseInt(newRedElement.style.height);
+    const redRandomLeft = Math.floor(Math.random() * redMaxLeft);
+    const redRandomTop = Math.floor(Math.random() * redMaxTop);
+    newRedElement.style.left = redRandomLeft + 'px';
+    newRedElement.style.top = redRandomTop + 'px';
+
+    
+    container.appendChild(newRedElement);
+
+    
+    container.addEventListener('mousemove', (event) => {
+        const containerRect = container.getBoundingClientRect();
+        const newRedElementRect = newRedElement.getBoundingClientRect();
+
+        
+        const newRedCenterX = newRedElementRect.left + newRedElementRect.width / 2;
+        const newRedCenterY = newRedElementRect.top + newRedElementRect.height / 2;
+
+        
+        const cursorX = event.clientX ;
+        const cursorY = event.clientY ;
+
+        
+        const angle = calculateAngle(newRedCenterX, newRedCenterY, cursorX, cursorY);
+        newRedElement.style.transform = `rotate(${angle}deg)`;
     });
-    text.addEventListener('onkeydown', () => {
-      if (event.key == 'Enter'){
-       // document.styleSheets[0].rules[0].style[4] = 600;
-        modalOverlay.style.display = 'block';
-      }
-    });
-  </script>
-  <input type="text" id = "tekst" />
-  <button id="przysisk"></button>
+});
+        startTimer();
+    </script>
 </body>
 </html>
