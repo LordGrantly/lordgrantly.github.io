@@ -389,6 +389,7 @@ enemy.targetY = enemy.y + moveY;
             state = "gameover";
             setTimeout(() => {
                 location.reload();
+                state = "playing";
         }, 5000);
             
         }
@@ -510,6 +511,7 @@ let cost = 1;
 
             alert("Game Over!");
             location.reload();
+            state = "playing";
         }});
     
     
@@ -597,6 +599,7 @@ preview.addEventListener("click", (event) => {
         if (isColliding(youRect, enemyRect)) {
             alert("Game Over!");
             location.reload();
+            state = "playing";
         }});
 
    
@@ -734,6 +737,7 @@ if (bonus.created >= lifetime) {
                 state = "gameover";
                 setTimeout(() => {
                     location.reload();
+                    state = "playing";
                 }, 5000);
             }
         });
