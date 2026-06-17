@@ -406,7 +406,7 @@ enemy.targetY = enemy.y + moveY;
     x: Math.random() * (canvas.width - 30),
     y: Math.random() * (canvas.height - 30),
     created: 0,
-    amount: Math.floor(playerPoints * 0.1) + Math.floor(Math.random() * 3) + 3,
+    amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
     element: createBonusElement()
     
 }); 
