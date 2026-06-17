@@ -75,7 +75,7 @@
     right: 30px;
     bottom: 100px;
 
-    width: 260px;
+    width: 400px;
 
     background: rgba(30, 30, 30, 0.95);
     border: 3px solid #555;
@@ -267,11 +267,12 @@ function updateShop() {
     offerings.forEach(offering => {
         const div = document.createElement("div");
         
-        div.textContent = `${offering.name_change ? offering.name_change() : offering.name} (${offering.cost} points)`;
+        div.innerHTML = `${offering.name_change ? offering.name_change() : offering.name} 
+            (<b><font color=green>${offering.cost}</font></b> points)`;
         div.style.cursor = "pointer";
-        div.style.padding = "12px";
+        div.style.padding = "10px";
         div.style.marginBottom = "10px";
-        div.style.borderRadius = "10px";
+        div.style.borderRadius = "20px";
         div.style.background = "rgba(255,255,255,0.08)";
         div.style.border = "1px solid rgba(255,255,255,0.1)";
         div.style.transition = "0.15s";
@@ -297,6 +298,7 @@ div.addEventListener("mouseleave", () => {
                 offering.cost = Math.floor(offering.cost * offering.multi);
                 div.textContent = `${offering.name} (${offering.cost} points)`;
                 title.textContent = "Points: " + playerPoints  ;
+                updateShop();
             }
         });
 
