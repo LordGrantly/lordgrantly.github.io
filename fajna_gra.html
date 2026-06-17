@@ -395,16 +395,7 @@ enemy.targetY = enemy.y + moveY;
         }, 5000);
             
         }
-        Bonuses.forEach(bonus => {
-
-            const bonusRect = bonus.element.getBoundingClientRect();
-            if (isColliding(enemyRect, bonusRect)) {
-                bonus.element.remove();
-
-                
-                
-            }
-        });
+        
     });
    
     
@@ -472,7 +463,7 @@ let cost = 1;
     enemy_points -= cost;
     addCross(Enemy_Type, form);
     }
-    Enemy_step += 20;
+    Enemy_step += 5;
     offerings.forEach(offering => {
 
         offering.name = offering.name_change();
@@ -787,16 +778,7 @@ if (bonus.created >= lifetime) {
         
         const enemyRect = enemy.element.getBoundingClientRect();
         
-        Bonuses.forEach(bonus => {
-
-            const bonusRect = bonus.element.getBoundingClientRect();
-            if (isColliding(enemyRect, bonusRect)) {
-                bonus.element.remove();
-
-                
-                
-            }
-        });
+        
     });
                 crosses.splice(i, 1);
             }
