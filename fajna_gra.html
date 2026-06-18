@@ -98,7 +98,7 @@
             border: 5px solid black;
             position : absolute ;
             left : 87% ;
-            top : 80% ;
+            top : 88% ;
             
 
         }
@@ -241,8 +241,10 @@ function isColliding(a, b) {
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         End_Button.style.display = "block";
+        let user = phone;
     }else{
         End_Button.style.display = "none";
+        let user = pc;
     }
 }
 window.addEventListener("resize", () => {
@@ -646,6 +648,9 @@ function draw() {
     
     if (Turns !== 0) square.style.backgroundColor = "rgba(0,0,100,0.6)";
     if (mode === "moving") {
+        if (user === "phone") {
+           End_Button.style.display = "block";
+        }
         Points_Display.display = "block";
         enemies.forEach(enemy => {
             enemy.element.style.display = "block";
@@ -827,7 +832,7 @@ if (bonus.created >= lifetime) {
         }
     } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    End_Button.style.display = "none";
     enemies.forEach(enemy => {
         enemy.element.style.display = "none";
         if (enemy.element.area) enemy.element.area.style.display = "none";
