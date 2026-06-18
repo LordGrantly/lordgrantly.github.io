@@ -12,7 +12,7 @@
     transform: translate(-50%, -50%);
     touch-action: none;
 }
-}
+
         #pe {
             position: absolute;
             left: 47%;
@@ -461,8 +461,8 @@ enemy.targetY = enemy.y + moveY;
     if (form === "bonus" && !bonus_spawned) {
     bonus_spawned = true;
     Bonuses.push({
-     x :Math.random() * (WORLD_WIDTH - 30);
-     y : Math.random() * (WORLD_HEIGHT - 30);
+     x :Math.random() * (WORLD_WIDTH - 30),
+     y : Math.random() * (WORLD_HEIGHT - 30),
     created: 0,
     amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
     element: createBonusElement()
