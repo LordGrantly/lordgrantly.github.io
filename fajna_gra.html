@@ -241,10 +241,10 @@ function isColliding(a, b) {
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         End_Button.style.display = "block";
-        let user = "phone";
+        user = "phone";
     }else{
         End_Button.style.display = "none";
-        let user = "pc";
+        user = "pc";
     }
 }
 window.addEventListener("resize", () => {
@@ -655,7 +655,7 @@ function draw() {
         if (user === "phone") {
            End_Button.style.display = "block";
         }
-        Points_Display.display = "block";
+        Points_Display.style.display = "block";
         enemies.forEach(enemy => {
             enemy.element.style.display = "block";
             if (enemy.element.area) enemy.element.area.style.display = "block";
@@ -694,7 +694,7 @@ if (bonus.created >= lifetime) {
         enemies.forEach(enemy => {
             if (enemy.progress < 1) {
                 finish = false;
-                enemy.progress += enemy.speed;
+                enemy.progress += enemy.speed * enemy.multi;
 
                 if (enemy.progress > 1) enemy.progress = 1;
 
@@ -702,7 +702,7 @@ if (bonus.created >= lifetime) {
                 enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
 
                 enemy.element.style.left = enemy.x + "px";
-                enemy.element.style.top = enemy.y + "px";
+                enemy.element.style.top = enemy.y + "px";                                
                 if (enemy.type === "slower") {
                     const areaSize = 300;
                     let area = enemy.element.area;
