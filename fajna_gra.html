@@ -241,6 +241,8 @@ function isColliding(a, b) {
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         End_Button.style.display = "block";
+    }else{
+        End_Button.style.display = "none";
     }
 }
 window.addEventListener("resize", () => {
