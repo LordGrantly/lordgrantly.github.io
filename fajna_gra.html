@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+      canvas {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    touch-action: none;
+}
+}
         #pe {
             position: absolute;
             left: 47%;
@@ -192,6 +200,8 @@ const Turns_Display = document.getElementById("pe");
 const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
+const WORLD_WIDTH = 1920;
+const WORLD_HEIGHT = 1080;
 let bonus_chance = 10;
 let Enemy_step = 160;
 let Max_turns = 2;
@@ -247,14 +257,22 @@ function device_check() {
         user = "pc";
     }
 }
-window.addEventListener("resize", () => {
-    if (user === "phone") {
-        canvas.width = window.innerWidth*5;
-        canvas.height = window.innerHeight*2;
-    } else{
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    }
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+
+    const scaleX = window.innerWidth / WORLD_WIDTH;
+    const scaleY = window.innerHeight / WORLD_HEIGHT;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    canvas.style.width = WORLD_WIDTH * scale + "px";
+    canvas.style.height = WORLD_HEIGHT * scale + "px";
+
+    canvas.width = WORLD_WIDTH * dpr;
+    canvas.height = WORLD_HEIGHT * dpr;
+
+    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+}
 });
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
@@ -421,8 +439,8 @@ enemy.targetY = enemy.y + moveY;
     if (form === "bonus" && !bonus_spawned) {
     let bonus_spawned = true;
     Bonuses.push({
-    x: Math.random() * (canvas.width - 30),
-    y: Math.random() * (canvas.height - 30),
+     x :Math.random() * (WORLD_WIDTH - 30);
+     y : Math.random() * (WORLD_HEIGHT - 30);
     created: 0,
     amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
     element: createBonusElement()
@@ -536,8 +554,8 @@ function setCanvas() {
 }
 function addCross(type,form) {
     
-    const x = Math.random() * (canvas.width - 32);
-    const y = Math.random() * (canvas.height - 32);
+ const x = Math.random() * (WORLD_WIDTH - 32);
+const y = Math.random() * (WORLD_HEIGHT - 32);
     
     crosses.push({
         x,
