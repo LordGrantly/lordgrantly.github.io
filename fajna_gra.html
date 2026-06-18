@@ -5,15 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        #Enable_End_Button_Button{
+            left:0%;
+            top: 0%;
+            background-color: aqua;
+            width:100px;
+            height: 50px;
+            position: absolute;
+            display: none;
+            
+
+
+
+
+        }
       canvas {
     position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    touch-action: none;
-    pointer-events: none; 
+    left: 0;
+    top: 0;
+    pointer-events: none;
 }
-
         #pe {
             position: absolute;
             left: 47%;
@@ -26,6 +37,9 @@
     top: 30px;
     font-weight: bold;
     font-size: 18px;
+}
+.enemy, .fast, .slower, .bigger, #You {
+    z-index: 10;
 }
 #Bonus {
     display: none;
@@ -106,8 +120,8 @@
             background-color:rgba(221, 133, 19, 0.95);
             border: 5px solid black;
             position : absolute ;
-            left : 87% ;
-            top : 88% ;
+            left : 90% ;
+            top : 84% ;
             
 
         }
@@ -182,7 +196,7 @@
 </head>
 
 <body>
-
+<div id="Enable_End_Button_Button">Enable button</div>
 <div id="Shop_Button"></div>
 <div id="Shop_Offerings"></div> 
 <div id="preview"></div>
@@ -201,9 +215,10 @@ const Turns_Display = document.getElementById("pe");
 const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
-const WORLD_WIDTH = 1600;
-const WORLD_HEIGHT = 950;
-let dpr = window.devicePixelRatio || 1;
+const Enable_End_Button_Button = document.getElementById("Enable_End_Button_Button");
+let user = "pc";
+
+
 let bonus_spawned = false;
 let bonus_chance = 10;
 let Enemy_step = 160;
@@ -224,6 +239,7 @@ let frosen = false;
 let playerPoints = 10;
 let PointsInc = 1;
 let state = "playing";
+let End_Button_Enabled = false;
 const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 25,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
@@ -239,31 +255,52 @@ const crosses = [];
 
 const enemies = [];
 const lifetime = 5;
+Enable_End_Button_Button.addEventListener('click', () =>{
+    End_Button.style.display = "block";
+    if (End_Button_Enabled){    
+        End_Button_Enabled = false;
+        Enable_End_Button_Button.textContent = "no";
+    }else{
+    End_Button_Enabled= true;
+    Enable_End_Button_Button.textContent= "yes";
+
+    }
+});
 End_Button.addEventListener('click', () => {
     if (state !== "playing") return;
     End_Turn();
 });
-function clampPlayer(x, y) {
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
+function clampPlayer(x, y, el = You) {
+    const rect = el.getBoundingClientRect();
 
-    const minX = 0;
-    const minY = 0;
-    const maxX = WORLD_WIDTH - pW;
-    const maxY = WORLD_HEIGHT - pH;
+    const maxX = window.innerWidth - rect.width;
+    const maxY = window.innerHeight - rect.height;
 
     return {
-        x: Math.max(minX, Math.min(maxX, x)),
-        y: Math.max(minY, Math.min(maxY, y))
+        x: Math.max(0, Math.min(maxX, x)),
+        y: Math.max(0, Math.min(maxY, y))
     };
 }
 function isColliding(a, b) {
     return !(
-        a.right < b.left ||
-        a.left > b.right ||
-        a.bottom < b.top ||
-        a.top > b.bottom 
+        a.right <= b.left ||
+        a.left >= b.right ||
+        a.bottom <= b.top ||
+        a.top >= b.bottom
     );
+}
+function getPos(el) {
+    const r = el.getBoundingClientRect();
+    return {
+        x: r.left,
+        y: r.top,
+        width: r.width,
+        height: r.height,
+        right: r.right,
+        bottom: r.bottom,
+        left: r.left,
+        top: r.top
+    };
 }
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
@@ -275,23 +312,12 @@ function device_check() {
     }
 }
 function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const scaleX = window.innerWidth / WORLD_WIDTH;
-    const scaleY = window.innerHeight / WORLD_HEIGHT;
-
-    const scale = Math.min(scaleX, scaleY);
-
-    canvas.style.width = WORLD_WIDTH * scale + "px";
-    canvas.style.height = WORLD_HEIGHT * scale + "px";
-
-    canvas.width = WORLD_WIDTH * dpr;
-    canvas.height = WORLD_HEIGHT * dpr;
-
-    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-
-    
-    }
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+}
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
 
@@ -407,26 +433,24 @@ function End_Turn() {
     enemy.startX = enemy.x;
     enemy.startY = enemy.y;
 
-    let dy = You.offsetTop - enemy.y;
-    let dx = You.offsetLeft - enemy.x;
+    const playerRect = You.getBoundingClientRect();
 
+    let dx = playerRect.left - enemy.x;
+    let dy = playerRect.top - enemy.y;
+
+    let step = Enemy_step * (enemy.type === "fast" ? 1.5 : 1);
 
     let moveX = 0;
     let moveY = 0;
-    let stepBase = Enemy_step;
 
-let step = enemy.type === "fast"    ? stepBase * 1.5: stepBase;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        moveX = Math.sign(dx) * Math.min(Math.abs(dx), step);
+    } else {
+        moveY = Math.sign(dy) * Math.min(Math.abs(dy), step);
+    }
 
-if (Math.abs(dx) > Math.abs(dy)) {
-    let move = Math.min(Math.abs(dx), step);
-    moveX = dx > 0 ? move : -move;
-} else {
-    let move = Math.min(Math.abs(dy), step);
-    moveY = dy > 0 ? move : -move;
-}
-
-enemy.targetX = enemy.x + moveX;
-enemy.targetY = enemy.y + moveY;
+    enemy.targetX = enemy.x + moveX;
+    enemy.targetY = enemy.y + moveY;
 
     enemy.progress = 0;
 });
@@ -457,8 +481,8 @@ enemy.targetY = enemy.y + moveY;
     if (form === "bonus" && !bonus_spawned) {
     bonus_spawned = true;
     Bonuses.push({
-     x :Math.random() * (WORLD_WIDTH - 30),
-     y : Math.random() * (WORLD_HEIGHT - 30),
+     x :Math.random() * (window.innerWidth  - 30),
+     y : Math.random() * (window.innerHeight - 30),
     created: 0,
     amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
     element: createBonusElement()
@@ -544,16 +568,15 @@ let cost = 1;
     const TpX = event.clientX - rect.left;
     const TpY = event.clientY - rect.top;
 
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
+    const pW = getPos(You).width;
+    const pH = getPos(You).height;
 
-    preview.style.left = (TpX - pW/2 + square.offsetLeft) + "px";
-    preview.style.top  = (TpY - pH/2 + square.offsetTop) + "px";
+    preview.style.left = (TpX - pW/2 + getPos(square).left) + "px";
+    preview.style.top  = (TpY - pH/2 + getPos(square).top) + "px";
     const clamped = clampPlayer(
-    TpX - pW/2 + square.offsetLeft,
-    TpY - pH/2 + square.offsetTop
-);
-
+    TpX - pW/2 + getPos(square).left,
+    TpY - pH/2 + getPos(square).top
+    )
 preview.style.left = clamped.x + "px";
 preview.style.top  = clamped.y + "px";
     square.style.display = "none";
@@ -577,8 +600,8 @@ function setCanvas() {
 }
 function addCross(type,form) {
     
- const x = Math.random() * (WORLD_WIDTH - 32);
-const y = Math.random() * (WORLD_HEIGHT - 32);
+ const x = Math.random() * (window.innerWidth  - 32);
+const y = Math.random() * (window.innerHeight - 32);
     
     crosses.push({
         x,
@@ -594,13 +617,13 @@ You.addEventListener("click", () => {
     if (state !== "playing") return;
     square.style.display = "block";
 
-    const pX = You.offsetLeft;
-    const pY = You.offsetTop;
+    const pX = getPos(You).left;
+    const pY = getPos(You).top;
 
-    const sqW = square.offsetWidth;
-    const sqH = square.offsetHeight;
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
+    const sqW = getPos(square).width;
+    const sqH = getPos(square).height;
+    const pW = getPos(You).width;
+    const pH = getPos(You).height;
 
     square.style.left = (pX - (sqW - pW) / 2) + "px";
     square.style.top  = (pY - (sqH - pH) / 2) + "px";
@@ -625,7 +648,7 @@ preview.addEventListener("click", (event) => {
     });
 
     
-        const clamped = clampPlayer(preview.offsetLeft, preview.offsetTop);
+        const clamped = clampPlayer(getPos(preview).left, getPos(preview).top);
 
         You.style.left = clamped.x + "px";
         You.style.top  = clamped.y + "px";
@@ -695,10 +718,11 @@ function draw() {
     
     if (Turns !== 0) square.style.backgroundColor = "rgba(0,0,100,0.6)";
     if (mode === "moving") {
-        if (user === "phone") {
+        if (user === "phone"|| End_Button_Enabled) {
            End_Button.style.display = "block";
         }
         Points_Display.style.display = "block";
+        Enable_End_Button_Button.style.display = "none";
         enemies.forEach(enemy => {
             enemy.element.style.display = "block";
             if (enemy.element.area) enemy.element.area.style.display = "block";
@@ -713,39 +737,28 @@ function draw() {
         let finish = true;
         
         for (let i = Bonuses.length - 1; i >= 0; i--) {
+    const b = Bonuses[i];
 
-const bonus = Bonuses[i];
+    if (b.created >= lifetime) {
+        b.element?.remove();
+        Bonuses.splice(i, 1);
+        continue;
+    }
 
-if (bonus.created >= lifetime) {
-
-    bonus.element.remove();
-
-    Bonuses.splice(i, 1);
-
-    continue;
-
-} else {
-
-    
-
-    bonus.element.style.left = bonus.x + "px";
-    bonus.element.style.top = bonus.y + "px";
-
-    
-}
+    b.element.style.left = b.x + "px";
+    b.element.style.top = b.y + "px";
 }
         enemies.forEach(enemy => {
             if (enemy.progress < 1) {
-                finish = false;
-                enemy.progress += enemy.speed * enemy.multi;
+                
+  
 
-                if (enemy.progress > 1) enemy.progress = 1;
+        enemy.progress = Math.min(1, enemy.progress + enemy.speed * enemy.multi);
+        enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+        enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
 
-                enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
-                enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
-
-                enemy.element.style.left = enemy.x + "px";
-                enemy.element.style.top = enemy.y + "px";                                
+        enemy.element.style.left = enemy.x + "px";
+        enemy.element.style.top = enemy.y + "px";                               
                 if (enemy.type === "slower") {
                     const areaSize = 300;
                     let area = enemy.element.area;
@@ -758,8 +771,8 @@ if (bonus.created >= lifetime) {
                         
                     }
                     
-                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2) + "px";
-                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2) + "px";
+                    area.style.left = (enemy.x - (areaSize - getPos(enemy).width) / 2) + "px";
+                    area.style.top = (enemy.y - (areaSize - getPos(enemy).height) / 2) + "px";
                     const YouRect = You.getBoundingClientRect();
                     
                     if(isColliding(YouRect, area.getBoundingClientRect())) {
@@ -773,13 +786,13 @@ if (bonus.created >= lifetime) {
                     }
                     square.style.width = range + "px";
                     square.style.height = range + "px";
-                    const pX = You.offsetLeft;
-                    const pY = You.offsetTop;
+                    const pX = getPos(You).left;
+                    const pY = getPos(You).top;
 
-                    const sqW = square.offsetWidth;
-                    const sqH = square.offsetHeight;
-                    const pW = You.offsetWidth;
-                    const pH = You.offsetHeight;
+                    const sqW = getPos(square).width;
+                    const sqH = getPos(square).height;
+                    const pW = getPos(You).width;
+                    const pH = getPos(You).height;
 
                     square.style.left = (pX - (sqW - pW) / 2) + "px";
                     square.style.top  = (pY - (sqH - pH) / 2) + "px";
@@ -803,10 +816,18 @@ if (bonus.created >= lifetime) {
             const cross = crosses[i];
             if (cross.clicked >= lifetime) {
                 const div = document.createElement("div");
-                const cRect = canvas.getBoundingClientRect();
 
-                div.style.left = (cRect.left + cross.x) + "px";
-                div.style.top = (cRect.top + cross.y) + "px";
+                
+
+                const screenX = cross.x;
+                const screenY = cross.y;
+                document.body.appendChild(div);
+
+                const w = div.offsetWidth;
+                const h = div.offsetHeight;
+
+                div.style.left = (screenX - w / 2) + "px";
+                div.style.top  = (screenY - h / 2) + "px";
                 if (cross.type === "normal") {
                 div.className =  "enemy" ;
                 div.style.backgroundColor =  "green"  ;
@@ -820,21 +841,25 @@ if (bonus.created >= lifetime) {
                 div.className =  "bigger" ;
                 div.style.backgroundColor =   "purple";
                 }
-                document.body.appendChild(div);
+                
 
                 enemies.push({
-                    x: cross.x,
-                    y: cross.y,
-                    targetX: cross.x,
-                    targetY: cross.y,
-                    startX: cross.x,
-                    startY: cross.y,
-                    multi: cross.type === "fast" ? 1.9 : 1,
-                    type: cross.type,
-                    progress: 1,
-                    speed: 0.05,
-                    element: div,
-                });
+    x: cross.x,
+    y: cross.y,
+
+    startX: cross.x,
+    startY: cross.y,
+    targetX: cross.x,
+    targetY: cross.y,
+
+    multi: cross.type === "fast" ? 1.9 : 1,
+    type: cross.type,
+
+    progress: 0,  
+    speed: 0.05,
+
+    element: div,
+});
                 enemies.forEach(enemy => {
         
     
@@ -879,6 +904,7 @@ if (bonus.created >= lifetime) {
         }
     } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    Enable_End_Button_Button.style.display = "block";
     End_Button.style.display = "none";
     enemies.forEach(enemy => {
         enemy.element.style.display = "none";
