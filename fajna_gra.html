@@ -91,14 +91,14 @@
     color: white;
 }
     #End_Button{
-            display: none;
+            display: block;
             width :200px;
             height: 60px;
             background-color:rgba(221, 133, 19, 0.95);
             border: 5px solid black;
             position : absolute ;
-            left : 50% ;
-            top : 90% ;
+            left : 87% ;
+            top : 80% ;
             
 
         }
@@ -148,6 +148,7 @@
     background-color: purple;
     border: 5px solid black;
     position: absolute;
+
   }
   #You{
     left: 50%;
@@ -225,6 +226,10 @@ const crosses = [];
 
 const enemies = [];
 const lifetime = 5;
+End_Button.addEventListener('click', () => {
+    if (state !== "playing") return;
+    End_Turn();
+});
 function isColliding(a, b) {
     return !(
         a.right < b.left ||
@@ -233,7 +238,11 @@ function isColliding(a, b) {
         a.top > b.bottom 
     );
 }
-
+function device_check() {
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        End_Button.style.display = "block";
+    }
+}
 window.addEventListener("resize", () => {
     
     canvas.width = window.innerWidth;
@@ -324,6 +333,7 @@ div.style.color = "pink";
 document.body.appendChild(div);
 
 return div;
+
 }
 function End_Turn() {
     if (state !== "playing") return;
@@ -416,7 +426,7 @@ enemy.targetY = enemy.y + moveY;
 Bonuses.forEach(bonus => {
         
         const bonusRect = bonus.element.getBoundingClientRect(); 
-if (isColliding(youRect, bonusRect)) {
+if (isColliding(youRect, bonusRect)) { 
             bonus.element.remove();
             playerPoints += bonus.amount;
             const div = document.createElement("div");
@@ -837,7 +847,7 @@ if (bonus.created >= lifetime) {
 }
             
     
-
+device_check();
 setCanvas();
 
 draw();
