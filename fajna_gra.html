@@ -272,7 +272,8 @@ function resizeCanvas() {
     canvas.height = WORLD_HEIGHT * dpr;
 
     ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-}
+
+    
 });
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
