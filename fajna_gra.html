@@ -202,6 +202,8 @@ const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
 const WORLD_WIDTH = 1920;
 const WORLD_HEIGHT = 1080;
+let dpr = window.devicePixelRatio || 1;
+let bonus_spawned = false;
 let bonus_chance = 10;
 let Enemy_step = 160;
 let Max_turns = 2;
@@ -240,6 +242,25 @@ End_Button.addEventListener('click', () => {
     if (state !== "playing") return;
     End_Turn();
 });
+function drawHUD() {
+    ctx.save();
+
+    
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const cx = canvas.width / (2 * dpr);
+    const cy = canvas.height / (2 * dpr);
+
+   ctx.fillText(`Points: ${playerPoints}`, cx, cy - 20);
+ctx.fillText(`Turn: ${turn}`, cx, cy + 20);
+
+    ctx.restore();
+}
 function isColliding(a, b) {
     return !(
         a.right < b.left ||
@@ -438,7 +459,7 @@ enemy.targetY = enemy.y + moveY;
     
     let form = Math.random()*100 < bonus_chance ? "bonus" : "enemy";
     if (form === "bonus" && !bonus_spawned) {
-    let bonus_spawned = true;
+    bonus_spawned = true;
     Bonuses.push({
      x :Math.random() * (WORLD_WIDTH - 30);
      y : Math.random() * (WORLD_HEIGHT - 30);
@@ -550,8 +571,7 @@ function setCanvas() {
     canvas = document.getElementById("mycanvas");
     
     ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+ 
 }
 function addCross(type,form) {
     
@@ -849,7 +869,7 @@ if (bonus.created >= lifetime) {
             ctx.lineTo(cross.x, cross.y + size);
             ctx.stroke();
         });
-
+          drawHUD();
         if (finish && state === "waiting") {
             state = "playing";
         }
@@ -879,6 +899,8 @@ if (bonus.created >= lifetime) {
     
 device_check();
 setCanvas();
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 draw();
 </script>
