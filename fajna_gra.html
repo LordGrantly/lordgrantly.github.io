@@ -241,10 +241,10 @@ function isColliding(a, b) {
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         End_Button.style.display = "block";
-        let user = phone;
+        let user = "phone";
     }else{
         End_Button.style.display = "none";
-        let user = pc;
+        let user = "pc";
     }
 }
 window.addEventListener("resize", () => {
