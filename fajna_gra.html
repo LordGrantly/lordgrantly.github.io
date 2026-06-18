@@ -11,6 +11,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     touch-action: none;
+    pointer-events: none; 
 }
 
         #pe {
@@ -200,8 +201,8 @@ const Turns_Display = document.getElementById("pe");
 const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
-const WORLD_WIDTH = 1920;
-const WORLD_HEIGHT = 1080;
+const WORLD_WIDTH = 1600;
+const WORLD_HEIGHT = 950;
 let dpr = window.devicePixelRatio || 1;
 let bonus_spawned = false;
 let bonus_chance = 10;
@@ -242,24 +243,19 @@ End_Button.addEventListener('click', () => {
     if (state !== "playing") return;
     End_Turn();
 });
-function drawHUD() {
-    ctx.save();
+function clampPlayer(x, y) {
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
 
-    
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const minX = 0;
+    const minY = 0;
+    const maxX = WORLD_WIDTH - pW;
+    const maxY = WORLD_HEIGHT - pH;
 
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const cx = canvas.width / (2 * dpr);
-    const cy = canvas.height / (2 * dpr);
-
-   ctx.fillText(`Points: ${playerPoints}`, cx, cy - 20);
-ctx.fillText(`Turn: ${turn}`, cx, cy + 20);
-
-    ctx.restore();
+    return {
+        x: Math.max(minX, Math.min(maxX, x)),
+        y: Math.max(minY, Math.min(maxY, y))
+    };
 }
 function isColliding(a, b) {
     return !(
@@ -553,7 +549,13 @@ let cost = 1;
 
     preview.style.left = (TpX - pW/2 + square.offsetLeft) + "px";
     preview.style.top  = (TpY - pH/2 + square.offsetTop) + "px";
-    
+    const clamped = clampPlayer(
+    TpX - pW/2 + square.offsetLeft,
+    TpY - pH/2 + square.offsetTop
+);
+
+preview.style.left = clamped.x + "px";
+preview.style.top  = clamped.y + "px";
     square.style.display = "none";
     const youRect = You.getBoundingClientRect();
     enemies.forEach(enemy => {
@@ -623,8 +625,10 @@ preview.addEventListener("click", (event) => {
     });
 
     
-    You.style.left =  preview.offsetLeft + "px";
-    You.style.top  =  preview.offsetTop + "px";
+        const clamped = clampPlayer(preview.offsetLeft, preview.offsetTop);
+
+        You.style.left = clamped.x + "px";
+        You.style.top  = clamped.y + "px";
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
@@ -869,7 +873,7 @@ if (bonus.created >= lifetime) {
             ctx.lineTo(cross.x, cross.y + size);
             ctx.stroke();
         });
-          drawHUD();
+          
         if (finish && state === "waiting") {
             state = "playing";
         }
