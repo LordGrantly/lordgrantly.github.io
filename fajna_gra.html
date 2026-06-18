@@ -5,26 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        #Enable_End_Button_Button{
-            left:0%;
-            top: 0%;
-            background-color: aqua;
-            width:100px;
-            height: 50px;
-            position: absolute;
-            display: none;
-            
-
-
-
-
-        }
       canvas {
     position: fixed;
     left: 0;
     top: 0;
-    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+    z-index: 0;
 }
+
         #pe {
             position: absolute;
             left: 47%;
@@ -37,9 +27,6 @@
     top: 30px;
     font-weight: bold;
     font-size: 18px;
-}
-.enemy, .fast, .slower, .bigger, #You {
-    z-index: 10;
 }
 #Bonus {
     display: none;
@@ -55,6 +42,7 @@
     position: fixed;
     right: 30px;
     bottom: 30px;
+    z-index: 10;
 
     width: 180px;
     height: 55px;
@@ -93,6 +81,7 @@
 }
 #Shop_Offerings {
     display: none;
+    z-index: 10;
 
     position: fixed;
     right: 30px;
@@ -115,15 +104,32 @@
 }
     #End_Button{
             display: block;
-            width :120px;
-            height: 40px;
+            z-index: 12;
+            width:180px;
+            height:55px;
             background-color:rgba(221, 133, 19, 0.95);
             border: 5px solid black;
-            position : absolute ;
-            left : 90% ;
-            top : 84% ;
-            
+            position: fixed;
+            right: 30px;
+            bottom: 100px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:bold;
+            font-size:18px;
+        }
+        
+    #mycanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
 
+    
+    #You, #preview, #square, #Points, #pe {
+            z-index: 11;
+            position: absolute;
         }
         
   #square{
@@ -196,13 +202,13 @@
 </head>
 
 <body>
-<div id="Enable_End_Button_Button">Enable button</div>
+
 <div id="Shop_Button"></div>
 <div id="Shop_Offerings"></div> 
 <div id="preview"></div>
 <h2 id="pe"><b>Turn: 0</b></h2>
 <div id="square"></div>
-<div id="End_Button"></div>
+<div id="End_Button">End Turn</div>
 <canvas id="mycanvas"></canvas>
 <div id="You"></div>
 <h3 id="Points">Points: 10</h3>
@@ -215,10 +221,9 @@ const Turns_Display = document.getElementById("pe");
 const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
-const Enable_End_Button_Button = document.getElementById("Enable_End_Button_Button");
-let user = "pc";
-
-
+let WORLD_WIDTH = window.innerWidth;
+let WORLD_HEIGHT = window.innerHeight;
+let dpr = 1;
 let bonus_spawned = false;
 let bonus_chance = 10;
 let Enemy_step = 160;
@@ -239,7 +244,7 @@ let frosen = false;
 let playerPoints = 10;
 let PointsInc = 1;
 let state = "playing";
-let End_Button_Enabled = false;
+let endTurnEnabled = true;
 const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 25,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
@@ -255,52 +260,51 @@ const crosses = [];
 
 const enemies = [];
 const lifetime = 5;
-Enable_End_Button_Button.addEventListener('click', () =>{
-    End_Button.style.display = "block";
-    if (End_Button_Enabled){    
-        End_Button_Enabled = false;
-        Enable_End_Button_Button.textContent = "no";
-    }else{
-    End_Button_Enabled= true;
-    Enable_End_Button_Button.textContent= "yes";
-
-    }
-});
 End_Button.addEventListener('click', () => {
-    if (state !== "playing") return;
+    if (state !== "playing" || !endTurnEnabled) return;
     End_Turn();
 });
-function clampPlayer(x, y, el = You) {
-    const rect = el.getBoundingClientRect();
 
-    const maxX = window.innerWidth - rect.width;
-    const maxY = window.innerHeight - rect.height;
 
-    return {
-        x: Math.max(0, Math.min(maxX, x)),
-        y: Math.max(0, Math.min(maxY, y))
-    };
+
+function updateEndButtonState() {
+    if (endTurnEnabled) {
+        End_Button.style.opacity = '1';
+        End_Button.style.pointerEvents = 'auto';
+    } else {
+        End_Button.style.opacity = '0.4';
+        End_Button.style.pointerEvents = 'none';
+    }
+}
+
+
+
+function drawHUD() {
+    ctx.save();
+
+    
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const cx = canvas.width / (2 * dpr);
+    const cy = canvas.height / (2 * dpr);
+
+   ctx.fillText(`Points: ${playerPoints}`, cx, cy - 20);
+ctx.fillText(`Turn: ${turn}`, cx, cy + 20);
+
+    ctx.restore();
 }
 function isColliding(a, b) {
     return !(
-        a.right <= b.left ||
-        a.left >= b.right ||
-        a.bottom <= b.top ||
-        a.top >= b.bottom
+        a.right < b.left ||
+        a.left > b.right ||
+        a.bottom < b.top ||
+        a.top > b.bottom 
     );
-}
-function getPos(el) {
-    const r = el.getBoundingClientRect();
-    return {
-        x: r.left,
-        y: r.top,
-        width: r.width,
-        height: r.height,
-        right: r.right,
-        bottom: r.bottom,
-        left: r.left,
-        top: r.top
-    };
 }
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
@@ -312,11 +316,16 @@ function device_check() {
     }
 }
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    WORLD_WIDTH = window.innerWidth;
+    WORLD_HEIGHT = window.innerHeight;
 
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
+    canvas.style.width = WORLD_WIDTH + "px";
+    canvas.style.height = WORLD_HEIGHT + "px";
+
+    canvas.width = WORLD_WIDTH;
+    canvas.height = WORLD_HEIGHT;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
@@ -341,6 +350,40 @@ function updateShop() {
     const title = document.createElement("h2");
     
     title.textContent = "Points: " + playerPoints  ;
+
+    // Shop toggle for main End Turn button
+    const toggleContainer = document.createElement('div');
+    toggleContainer.style.display = 'flex';
+    toggleContainer.style.flexDirection = 'column';
+    toggleContainer.style.gap = '8px';
+    toggleContainer.style.marginBottom = '12px';
+
+    const toggleLabel = document.createElement('div');
+    toggleLabel.textContent = 'Main End Turn Button:';
+    toggleLabel.style.color = 'white';
+    toggleLabel.style.fontSize = '16px';
+    toggleLabel.style.fontWeight = 'bold';
+
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = endTurnEnabled ? 'Disable End Turn' : 'Enable End Turn';
+    toggleButton.style.padding = '10px';
+    toggleButton.style.background = '#3d7a20';
+    toggleButton.style.color = 'white';
+    toggleButton.style.border = '2px solid #111';
+    toggleButton.style.borderRadius = '12px';
+    toggleButton.style.cursor = 'pointer';
+    toggleButton.style.fontSize = '14px';
+    toggleButton.style.fontWeight = 'bold';
+
+    toggleButton.addEventListener('click', () => {
+        endTurnEnabled = !endTurnEnabled;
+        toggleButton.textContent = endTurnEnabled ? 'Disable End Turn' : 'Enable End Turn';
+        updateEndButtonState();
+    });
+
+    toggleContainer.appendChild(toggleLabel);
+    toggleContainer.appendChild(toggleButton);
+    Shop_Offerings.appendChild(toggleContainer);
 
     Shop_Offerings.appendChild(title);
     offerings.forEach(offering => {
@@ -383,6 +426,7 @@ div.addEventListener("mouseleave", () => {
 
         Shop_Offerings.appendChild(div);
     });
+
 }
 
 function createBonusElement() {
@@ -433,24 +477,26 @@ function End_Turn() {
     enemy.startX = enemy.x;
     enemy.startY = enemy.y;
 
-    const playerRect = You.getBoundingClientRect();
+    let dy = You.offsetTop - enemy.y;
+    let dx = You.offsetLeft - enemy.x;
 
-    let dx = playerRect.left - enemy.x;
-    let dy = playerRect.top - enemy.y;
-
-    let step = Enemy_step * (enemy.type === "fast" ? 1.5 : 1);
 
     let moveX = 0;
     let moveY = 0;
+    let stepBase = Enemy_step;
 
-    if (Math.abs(dx) > Math.abs(dy)) {
-        moveX = Math.sign(dx) * Math.min(Math.abs(dx), step);
-    } else {
-        moveY = Math.sign(dy) * Math.min(Math.abs(dy), step);
-    }
+let step = enemy.type === "fast"    ? stepBase * 1.5: stepBase;
 
-    enemy.targetX = enemy.x + moveX;
-    enemy.targetY = enemy.y + moveY;
+if (Math.abs(dx) > Math.abs(dy)) {
+    let move = Math.min(Math.abs(dx), step);
+    moveX = dx > 0 ? move : -move;
+} else {
+    let move = Math.min(Math.abs(dy), step);
+    moveY = dy > 0 ? move : -move;
+}
+
+enemy.targetX = enemy.x + moveX;
+enemy.targetY = enemy.y + moveY;
 
     enemy.progress = 0;
 });
@@ -481,8 +527,8 @@ function End_Turn() {
     if (form === "bonus" && !bonus_spawned) {
     bonus_spawned = true;
     Bonuses.push({
-     x :Math.random() * (window.innerWidth  - 30),
-     y : Math.random() * (window.innerHeight - 30),
+     x :Math.random() * (WORLD_WIDTH - 30),
+     y : Math.random() * (WORLD_HEIGHT - 30),
     created: 0,
     amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
     element: createBonusElement()
@@ -568,17 +614,12 @@ let cost = 1;
     const TpX = event.clientX - rect.left;
     const TpY = event.clientY - rect.top;
 
-    const pW = getPos(You).width;
-    const pH = getPos(You).height;
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
 
-    preview.style.left = (TpX - pW/2 + getPos(square).left) + "px";
-    preview.style.top  = (TpY - pH/2 + getPos(square).top) + "px";
-    const clamped = clampPlayer(
-    TpX - pW/2 + getPos(square).left,
-    TpY - pH/2 + getPos(square).top
-    )
-preview.style.left = clamped.x + "px";
-preview.style.top  = clamped.y + "px";
+    preview.style.left = (TpX - pW/2 + square.offsetLeft) + "px";
+    preview.style.top  = (TpY - pH/2 + square.offsetTop) + "px";
+    
     square.style.display = "none";
     const youRect = You.getBoundingClientRect();
     enemies.forEach(enemy => {
@@ -600,8 +641,8 @@ function setCanvas() {
 }
 function addCross(type,form) {
     
- const x = Math.random() * (window.innerWidth  - 32);
-const y = Math.random() * (window.innerHeight - 32);
+ const x = Math.random() * (WORLD_WIDTH - 32);
+const y = Math.random() * (WORLD_HEIGHT - 32);
     
     crosses.push({
         x,
@@ -617,13 +658,13 @@ You.addEventListener("click", () => {
     if (state !== "playing") return;
     square.style.display = "block";
 
-    const pX = getPos(You).left;
-    const pY = getPos(You).top;
+    const pX = You.offsetLeft;
+    const pY = You.offsetTop;
 
-    const sqW = getPos(square).width;
-    const sqH = getPos(square).height;
-    const pW = getPos(You).width;
-    const pH = getPos(You).height;
+    const sqW = square.offsetWidth;
+    const sqH = square.offsetHeight;
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
 
     square.style.left = (pX - (sqW - pW) / 2) + "px";
     square.style.top  = (pY - (sqH - pH) / 2) + "px";
@@ -648,10 +689,8 @@ preview.addEventListener("click", (event) => {
     });
 
     
-        const clamped = clampPlayer(getPos(preview).left, getPos(preview).top);
-
-        You.style.left = clamped.x + "px";
-        You.style.top  = clamped.y + "px";
+    You.style.left =  preview.offsetLeft + "px";
+    You.style.top  =  preview.offsetTop + "px";
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
@@ -718,11 +757,8 @@ function draw() {
     
     if (Turns !== 0) square.style.backgroundColor = "rgba(0,0,100,0.6)";
     if (mode === "moving") {
-        if (user === "phone"|| End_Button_Enabled) {
-           End_Button.style.display = "block";
-        }
+        End_Button.style.display = "block";
         Points_Display.style.display = "block";
-        Enable_End_Button_Button.style.display = "none";
         enemies.forEach(enemy => {
             enemy.element.style.display = "block";
             if (enemy.element.area) enemy.element.area.style.display = "block";
@@ -737,28 +773,39 @@ function draw() {
         let finish = true;
         
         for (let i = Bonuses.length - 1; i >= 0; i--) {
-    const b = Bonuses[i];
 
-    if (b.created >= lifetime) {
-        b.element?.remove();
-        Bonuses.splice(i, 1);
-        continue;
-    }
+const bonus = Bonuses[i];
 
-    b.element.style.left = b.x + "px";
-    b.element.style.top = b.y + "px";
+if (bonus.created >= lifetime) {
+
+    bonus.element.remove();
+
+    Bonuses.splice(i, 1);
+
+    continue;
+
+} else {
+
+    
+
+    bonus.element.style.left = bonus.x + "px";
+    bonus.element.style.top = bonus.y + "px";
+
+    
+}
 }
         enemies.forEach(enemy => {
             if (enemy.progress < 1) {
-                
-  
+                finish = false;
+                enemy.progress += enemy.speed * enemy.multi;
 
-        enemy.progress = Math.min(1, enemy.progress + enemy.speed * enemy.multi);
-        enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
-        enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+                if (enemy.progress > 1) enemy.progress = 1;
 
-        enemy.element.style.left = enemy.x + "px";
-        enemy.element.style.top = enemy.y + "px";                               
+                enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+                enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+
+                enemy.element.style.left = enemy.x + "px";
+                enemy.element.style.top = enemy.y + "px";                                
                 if (enemy.type === "slower") {
                     const areaSize = 300;
                     let area = enemy.element.area;
@@ -771,8 +818,8 @@ function draw() {
                         
                     }
                     
-                    area.style.left = (enemy.x - (areaSize - getPos(enemy).width) / 2) + "px";
-                    area.style.top = (enemy.y - (areaSize - getPos(enemy).height) / 2) + "px";
+                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2) + "px";
+                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2) + "px";
                     const YouRect = You.getBoundingClientRect();
                     
                     if(isColliding(YouRect, area.getBoundingClientRect())) {
@@ -786,13 +833,13 @@ function draw() {
                     }
                     square.style.width = range + "px";
                     square.style.height = range + "px";
-                    const pX = getPos(You).left;
-                    const pY = getPos(You).top;
+                    const pX = You.offsetLeft;
+                    const pY = You.offsetTop;
 
-                    const sqW = getPos(square).width;
-                    const sqH = getPos(square).height;
-                    const pW = getPos(You).width;
-                    const pH = getPos(You).height;
+                    const sqW = square.offsetWidth;
+                    const sqH = square.offsetHeight;
+                    const pW = You.offsetWidth;
+                    const pH = You.offsetHeight;
 
                     square.style.left = (pX - (sqW - pW) / 2) + "px";
                     square.style.top  = (pY - (sqH - pH) / 2) + "px";
@@ -816,18 +863,10 @@ function draw() {
             const cross = crosses[i];
             if (cross.clicked >= lifetime) {
                 const div = document.createElement("div");
+                const cRect = canvas.getBoundingClientRect();
 
-                
-
-                const screenX = cross.x;
-                const screenY = cross.y;
-                document.body.appendChild(div);
-
-                const w = div.offsetWidth;
-                const h = div.offsetHeight;
-
-                div.style.left = (screenX - w / 2) + "px";
-                div.style.top  = (screenY - h / 2) + "px";
+                div.style.left = (cRect.left + cross.x) + "px";
+                div.style.top = (cRect.top + cross.y) + "px";
                 if (cross.type === "normal") {
                 div.className =  "enemy" ;
                 div.style.backgroundColor =  "green"  ;
@@ -841,25 +880,21 @@ function draw() {
                 div.className =  "bigger" ;
                 div.style.backgroundColor =   "purple";
                 }
-                
+                document.body.appendChild(div);
 
                 enemies.push({
-    x: cross.x,
-    y: cross.y,
-
-    startX: cross.x,
-    startY: cross.y,
-    targetX: cross.x,
-    targetY: cross.y,
-
-    multi: cross.type === "fast" ? 1.9 : 1,
-    type: cross.type,
-
-    progress: 0,  
-    speed: 0.05,
-
-    element: div,
-});
+                    x: cross.x,
+                    y: cross.y,
+                    targetX: cross.x,
+                    targetY: cross.y,
+                    startX: cross.x,
+                    startY: cross.y,
+                    multi: cross.type === "fast" ? 1.9 : 1,
+                    type: cross.type,
+                    progress: 1,
+                    speed: 0.05,
+                    element: div,
+                });
                 enemies.forEach(enemy => {
         
     
@@ -898,13 +933,12 @@ function draw() {
             ctx.lineTo(cross.x, cross.y + size);
             ctx.stroke();
         });
-          
+          drawHUD();
         if (finish && state === "waiting") {
             state = "playing";
         }
     } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    Enable_End_Button_Button.style.display = "block";
     End_Button.style.display = "none";
     enemies.forEach(enemy => {
         enemy.element.style.display = "none";
@@ -931,7 +965,8 @@ device_check();
 setCanvas();
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
-
+updateEndButtonState();
+resizeCanvas();
 draw();
 </script>
 </body>
