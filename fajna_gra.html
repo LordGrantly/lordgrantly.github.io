@@ -92,8 +92,8 @@
 }
     #End_Button{
             display: block;
-            width :200px;
-            height: 60px;
+            width :120px;
+            height: 40px;
             background-color:rgba(221, 133, 19, 0.95);
             border: 5px solid black;
             position : absolute ;
@@ -248,9 +248,13 @@ function device_check() {
     }
 }
 window.addEventListener("resize", () => {
-    
+    if (user === "phone") {
+        canvas.width = window.innerWidth*5;
+        canvas.height = window.innerHeight*2;
+    } else{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    }
 });
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
