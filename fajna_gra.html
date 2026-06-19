@@ -246,7 +246,6 @@
 <canvas id="mycanvas"></canvas>
 <div id="You"></div>
 <h3 id="Points">Points: 10</h3>
-<div id="touch_debug" style="position:fixed;left:6px;top:6px;z-index:2000;background:rgba(0,0,0,0.6);color:white;padding:6px;border-radius:6px;font-family:monospace;font-size:12px;display:none"></div>
 <script>
 let turn = 0;
 const Points_Display = document.getElementById("Points");
@@ -260,8 +259,6 @@ const square = document.getElementById("square");
 let dpr = 1;
 let cameraX = 0;
 let cameraY = 0;
-let touchStartX = 0;
-let touchStartY = 0;
 let VIEWPORT_WIDTH = 0;
 let VIEWPORT_HEIGHT = 0;
 let playerX = 0;
@@ -295,7 +292,7 @@ const offerings = [
     { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
     { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 25, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
 ];
 const slower_areas = [];
 const Bonuses =[];
@@ -1096,62 +1093,52 @@ You.style.top = (playerY - cameraY) + "px";
 
 
 if (user === "phone") {
-    // pointer-based panning for touch devices (works better than raw touch events)
     let isPanning = false;
     let panLastX = 0;
     let panLastY = 0;
 
-    function startPan(x, y, pointerId, target) {
+    function startPan(x, y) {
         if (state !== "playing" || mode !== "moving") return;
         isPanning = true;
         panLastX = x;
         panLastY = y;
-        try { if (target && target.setPointerCapture) target.setPointerCapture(pointerId); } catch (e) {}
-        const dbg = document.getElementById('touch_debug'); if (dbg) { dbg.style.display = 'block'; dbg.textContent = `panstart ${panLastX.toFixed(1)},${panLastY.toFixed(1)}\ncam ${cameraX.toFixed(1)},${cameraY.toFixed(1)}` }
     }
 
     function movePan(x, y) {
         if (!isPanning) return;
         const deltaX = panLastX - x;
         const deltaY = panLastY - y;
-        cameraX += deltaX;
-        cameraY += deltaY;
-        cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
-        cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
         panLastX = x;
         panLastY = y;
-        const dbg2 = document.getElementById('touch_debug'); if (dbg2) dbg2.textContent = `panmove d:${deltaX.toFixed(1)},${deltaY.toFixed(1)}\ncam ${cameraX.toFixed(1)},${cameraY.toFixed(1)}`;
+        cameraX = Math.max(0, Math.min(cameraX + deltaX, WORLD_WIDTH - VIEWPORT_WIDTH));
+        cameraY = Math.max(0, Math.min(cameraY + deltaY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
     }
 
-    function endPan(pointerId, target) {
+    function endPan() {
         isPanning = false;
-        try { if (target && target.releasePointerCapture) target.releasePointerCapture(pointerId); } catch (e) {}
-        const dbg3 = document.getElementById('touch_debug'); if (dbg3) { dbg3.textContent += "\nend"; setTimeout(()=>{ if(dbg3) dbg3.style.display='none'; }, 600); }
     }
 
-    // Use pointer events on the canvas so gestures start there and don't trigger page scroll
-    canvas.addEventListener('pointerdown', (e) => {
+    window.addEventListener('pointerdown', (e) => {
         if (e.pointerType !== 'touch') return;
-        startPan(e.clientX, e.clientY, e.pointerId, e.target);
+        startPan(e.clientX, e.clientY);
         e.preventDefault();
     }, { passive: false });
 
-    canvas.addEventListener('pointermove', (e) => {
+    window.addEventListener('pointermove', (e) => {
         if (e.pointerType !== 'touch') return;
         movePan(e.clientX, e.clientY);
         if (isPanning) e.preventDefault();
     }, { passive: false });
 
-    canvas.addEventListener('pointerup', (e) => {
+    window.addEventListener('pointerup', (e) => {
         if (e.pointerType !== 'touch') return;
-        endPan(e.pointerId, e.target);
+        endPan();
     }, { passive: true });
 
-    canvas.addEventListener('pointercancel', (e) => {
+    window.addEventListener('pointercancel', (e) => {
         if (e.pointerType !== 'touch') return;
-        endPan(e.pointerId, e.target);
+        endPan();
     }, { passive: true });
-
 }
 
 draw();
