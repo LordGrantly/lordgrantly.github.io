@@ -678,16 +678,15 @@ let cost = 1;
     if (state !== "playing") return;
     preview.style.display = "block";
 
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
+    const previewHalfW = preview.offsetWidth / 2;
+    const previewHalfH = preview.offsetHeight / 2;
 
+    const worldX = event.clientX + cameraX;
+    const worldY = event.clientY + cameraY;
 
-    const worldX = event.clientX + cameraX - pW/2;
-    const worldY = event.clientY + cameraY - pH/2;
-    
-    preview.style.left = (worldX - cameraX) + "px";
-    preview.style.top  = (worldY - cameraY) + "px";
-    
+    preview.style.left = (worldX - cameraX - previewHalfW) + "px";
+    preview.style.top  = (worldY - cameraY - previewHalfH) + "px";
+
     square.style.display = "none";
     // store preview world pos for later when placing player
     preview.dataset.worldX = worldX;
@@ -731,10 +730,10 @@ You.addEventListener("click", () => {
 
     const sqW = square.offsetWidth;
     const sqH = square.offsetHeight;
-    square.style.left = `${VIEWPORT_WIDTH / 2 - sqW / 2}px`;
-    square.style.top = `${VIEWPORT_HEIGHT / 2 - sqH / 2}px`;
-    
-    
+    const centerX = playerX - cameraX;
+    const centerY = playerY - cameraY;
+    square.style.left = `${centerX - sqW / 2}px`;
+    square.style.top = `${centerY - sqH / 2}px`;
 });
 preview.addEventListener("click", (event) => {
     if (state !== "playing") return;
@@ -754,8 +753,16 @@ preview.addEventListener("click", (event) => {
     });
 
     
-    const worldX = Number(preview.dataset.worldX) || (preview.offsetLeft + cameraX);
-    const worldY = Number(preview.dataset.worldY) || (preview.offsetTop + cameraY);
+    const savedWorldX = Number(preview.dataset.worldX);
+    const savedWorldY = Number(preview.dataset.worldY);
+    const previewHalfW = preview.offsetWidth / 2;
+    const previewHalfH = preview.offsetHeight / 2;
+    const worldX = Number.isFinite(savedWorldX)
+        ? savedWorldX
+        : preview.offsetLeft + cameraX + previewHalfW;
+    const worldY = Number.isFinite(savedWorldY)
+        ? savedWorldY
+        : preview.offsetTop + cameraY + previewHalfH;
     const clamped = clampPlayerPosition(worldX, worldY);
     // update player world coords then position element with camera offset
     playerX = clamped.x;
@@ -780,13 +787,11 @@ preview.addEventListener("click", (event) => {
     square.style.height = range + "px"; 
     
    
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
     const sqW = square.offsetWidth;
     const sqH = square.offsetHeight;
-    square.style.left = (clamped.x - sqW/2 + pW/2 - cameraX) + "px";
-    square.style.top = (clamped.y - sqH/2 + pH/2 - cameraY) + "px";
-    
+    square.style.left = (clamped.x - cameraX - sqW / 2) + "px";
+    square.style.top = (clamped.y - cameraY - sqH / 2) + "px";
+
 
     if (user === "phone") {
         const centerX = clamped.x - VIEWPORT_WIDTH / 2;
@@ -863,15 +868,25 @@ function draw() {
         if (square.style.display !== "none") {
             const sqW = square.offsetWidth;
             const sqH = square.offsetHeight;
-            square.style.left = `${VIEWPORT_WIDTH / 2 - sqW / 2}px`;
-            square.style.top = `${VIEWPORT_HEIGHT / 2 - sqH / 2}px`;
+            const centerX = playerX - cameraX;
+            const centerY = playerY - cameraY;
+            square.style.left = (centerX - sqW / 2) + "px";
+            square.style.top = (centerY - sqH / 2) + "px";
         }
         
         if (preview.style.display !== "none") {
-            const worldX = Number(preview.dataset.worldX) || (preview.offsetLeft + cameraX);
-            const worldY = Number(preview.dataset.worldY) || (preview.offsetTop + cameraY);
-            preview.style.left = (worldX - cameraX) + "px";
-            preview.style.top = (worldY - cameraY) + "px";
+            const savedWorldX = Number(preview.dataset.worldX);
+            const savedWorldY = Number(preview.dataset.worldY);
+            const previewHalfW = preview.offsetWidth / 2;
+            const previewHalfH = preview.offsetHeight / 2;
+            const worldX = Number.isFinite(savedWorldX)
+                ? savedWorldX
+                : preview.offsetLeft + cameraX + previewHalfW;
+            const worldY = Number.isFinite(savedWorldY)
+                ? savedWorldY
+                : preview.offsetTop + cameraY + previewHalfH;
+            preview.style.left = (worldX - cameraX - previewHalfW) + "px";
+            preview.style.top = (worldY - cameraY - previewHalfH) + "px";
         }
         
         for (let i = Bonuses.length - 1; i >= 0; i--) {
