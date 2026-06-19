@@ -14,18 +14,22 @@
         user-select: none;
         -webkit-touch-callout: none;
 }
+            html, body {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
             html { touch-action: none; }
             canvas {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
-        touch-action: none;
-        -ms-touch-action: none;
-        z-index: 0;
-        border: 1px solid rgb(99, 11, 11);
-}
+                position: fixed;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+                -ms-touch-action: none;
+                z-index: 0;
+                border: 1px solid rgb(99, 11, 11);
+            }
 
         #pe {
             position: absolute;
@@ -353,23 +357,15 @@ function device_check() {
 }
 function setCanvas() {
     canvas = document.getElementById("mycanvas");
-    
     ctx = canvas.getContext("2d");
-    VIEWPORT_WIDTH = window.innerWidth;
-    VIEWPORT_HEIGHT = window.innerHeight;
-    
-    if (user === "pc") {
-        WORLD_WIDTH = window.innerWidth;
-        WORLD_HEIGHT = window.innerHeight;
-    } else {
-        WORLD_WIDTH = 2000;
-        WORLD_HEIGHT = 2000;
-    }
-    
+    resizeCanvas();
 }
 function resizeCanvas() {
-    VIEWPORT_WIDTH = window.innerWidth;
-    VIEWPORT_HEIGHT = window.innerHeight;
+    const viewportWidth = window.visualViewport?.width || window.innerWidth;
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+
+    VIEWPORT_WIDTH = viewportWidth;
+    VIEWPORT_HEIGHT = viewportHeight;
     
     if (user === "pc") {
         WORLD_WIDTH = window.innerWidth;
@@ -379,7 +375,6 @@ function resizeCanvas() {
         WORLD_HEIGHT = 2000;
     }
 
-   
     const canvasWidth = user === "phone" ? VIEWPORT_WIDTH : WORLD_WIDTH;
     const canvasHeight = user === "phone" ? VIEWPORT_HEIGHT : WORLD_HEIGHT;
 
@@ -392,6 +387,9 @@ function resizeCanvas() {
     canvas.height = Math.floor(canvasHeight * dpr);
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
+    cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
 }
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
@@ -703,12 +701,6 @@ let cost = 1;
     
     
 });
-function setCanvas() {
-    canvas = document.getElementById("mycanvas");
-    
-    ctx = canvas.getContext("2d");
- 
-}
 function addCross(type,form) {
     
  const x = Math.random() * (WORLD_WIDTH - 32);
@@ -1105,6 +1097,10 @@ device_check();
 setCanvas();
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resizeCanvas);
+    window.visualViewport.addEventListener("scroll", resizeCanvas);
+}
 updateEndButtonState();
 resizeCanvas();
 
