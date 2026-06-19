@@ -221,6 +221,7 @@
     background-color: rgb(26, 165, 112);
     border: 5px solid black;
     position: absolute;
+    transform: translate(-50%, -50%);
   }
 #preview{
     display:none;
@@ -728,16 +729,10 @@ You.addEventListener("click", () => {
     if (state !== "playing") return;
     square.style.display = "block";
 
-    const pX = playerX - cameraX;
-    const pY = playerY - cameraY;
-
     const sqW = square.offsetWidth;
     const sqH = square.offsetHeight;
-    const pW = You.offsetWidth;
-    const pH = You.offsetHeight;
-
-    square.style.left = (pX - (sqW - pW) / 2) + "px";
-    square.style.top  = (pY - (sqH - pH) / 2) + "px";
+    square.style.left = `${VIEWPORT_WIDTH / 2 - sqW / 2}px`;
+    square.style.top = `${VIEWPORT_HEIGHT / 2 - sqH / 2}px`;
     
     
 });
@@ -865,16 +860,11 @@ function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let finish = true;
 
-        You.style.left = (playerX - cameraX) + "px";
-        You.style.top = (playerY - cameraY) + "px";
-
         if (square.style.display !== "none") {
-            const pW = You.offsetWidth;
-            const pH = You.offsetHeight;
             const sqW = square.offsetWidth;
             const sqH = square.offsetHeight;
-            square.style.left = (playerX - cameraX - (sqW - pW) / 2) + "px";
-            square.style.top = (playerY - cameraY - (sqH - pH) / 2) + "px";
+            square.style.left = `${VIEWPORT_WIDTH / 2 - sqW / 2}px`;
+            square.style.top = `${VIEWPORT_HEIGHT / 2 - sqH / 2}px`;
         }
         
         if (preview.style.display !== "none") {
@@ -940,47 +930,45 @@ if (bonus.created >= lifetime) {
 
                 enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
                 enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+            }
 
-                enemy.element.style.left = (enemy.x - cameraX) + "px";
-                enemy.element.style.top = (enemy.y - cameraY) + "px";                                
-                if (enemy.type === "slower") {
-                    const areaSize = 300;
-                    let area = enemy.element.area;
-                    if (!area) {
-                        area = document.createElement("div");
-                        area.className = "slower_area";
-                        document.body.appendChild(area);
-                        enemy.element.area = area;
-                        
-                        
-                    }
-                    
-                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2 - cameraX) + "px";
-                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2 - cameraY) + "px";
-                    const YouRect = You.getBoundingClientRect();
-                    
-                    if(isColliding(YouRect, area.getBoundingClientRect())) {
-                        frosen = true;
-                    } 
-                    if (frosen) {
-                        range = true_range * 0.5 + 50;
-                        
-                    } else {
-                        range = true_range;
-                    }
-                    square.style.width = range + "px";
-                    square.style.height = range + "px";
-                    const pX = You.offsetLeft;
-                    const pY = You.offsetTop;
+            enemy.element.style.left = (enemy.x - cameraX) + "px";
+            enemy.element.style.top = (enemy.y - cameraY) + "px";
 
-                    const sqW = square.offsetWidth;
-                    const sqH = square.offsetHeight;
-                    const pW = You.offsetWidth;
-                    const pH = You.offsetHeight;
-
-                    square.style.left = (pX - (sqW - pW) / 2) + "px";
-                    square.style.top  = (pY - (sqH - pH) / 2) + "px";
+            if (enemy.type === "slower") {
+                const areaSize = 300;
+                let area = enemy.element.area;
+                if (!area) {
+                    area = document.createElement("div");
+                    area.className = "slower_area";
+                    document.body.appendChild(area);
+                    enemy.element.area = area;
                 }
+
+                area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2 - cameraX) + "px";
+                area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2 - cameraY) + "px";
+                
+                const YouRect = You.getBoundingClientRect();
+                if (isColliding(YouRect, area.getBoundingClientRect())) {
+                    frosen = true;
+                }
+                if (frosen) {
+                    range = true_range * 0.5 + 50;
+                } else {
+                    range = true_range;
+                }
+                square.style.width = range + "px";
+                square.style.height = range + "px";
+                const pX = You.offsetLeft;
+                const pY = You.offsetTop;
+
+                const sqW = square.offsetWidth;
+                const sqH = square.offsetHeight;
+                const pW = You.offsetWidth;
+                const pH = You.offsetHeight;
+
+                square.style.left = (pX - (sqW - pW) / 2) + "px";
+                square.style.top  = (pY - (sqH - pH) / 2) + "px";
             }
         });
 
@@ -1108,8 +1096,6 @@ resizeCanvas();
 // Initialize player world position centered in the world
 playerX = Math.floor(WORLD_WIDTH / 2);
 playerY = Math.floor(WORLD_HEIGHT / 2);
-You.style.left = (playerX - cameraX) + "px";
-You.style.top = (playerY - cameraY) + "px";
 
 
 let isPanning = false;
