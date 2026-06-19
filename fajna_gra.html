@@ -5,20 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-      body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+            body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
 }
-      canvas {
-    position: fixed;
-    left: 1;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    touch-action: none;
-    z-index: 0;
-    border: 1px solid rgb(99, 11, 11);    
+            html { touch-action: none; }
+            canvas {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        touch-action: none;
+        -ms-touch-action: none;
+        z-index: 0;
+        border: 1px solid rgb(99, 11, 11);
 }
 
         #pe {
@@ -168,6 +174,8 @@
     background-color: yellow;
     border: 5px solid black;
     position: absolute;
+    touch-action: none;
+    pointer-events: none;
   }
   .enemy {
     width: 40px;
@@ -175,6 +183,8 @@
     background-color: red;
     border: 5px solid black;
     position: absolute;
+    touch-action: none;
+    pointer-events: none;
   }
   .slower {
     width: 50px;
@@ -182,6 +192,8 @@
     background-color: blue;
     border: 5px solid black;
     position: absolute;
+    pointer-events: none;
+    touch-action: none;
   }
   .slower_area {
     width: 300px;
@@ -197,6 +209,8 @@
     background-color: purple;
     border: 5px solid black;
     position: absolute;
+    touch-action: none;
+    pointer-events: none;
 
   }
   #You{
@@ -249,6 +263,8 @@ let touchStartX = 0;
 let touchStartY = 0;
 let VIEWPORT_WIDTH = 0;
 let VIEWPORT_HEIGHT = 0;
+let playerX = 0;
+let playerY = 0;
 let bonus_spawned = false;
 let bonus_chance = 10;
 let Enemy_step = 160;
@@ -325,10 +341,12 @@ function isColliding(a, b) {
     );
 }
 function device_check() {
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
+    // Detect touch-capable devices more reliably than UA alone
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isTouch) {
         End_Button.style.display = "block";
         user = "phone";
-    }else{
+    } else {
         End_Button.style.display = "none";
         user = "pc";
     }
@@ -365,13 +383,15 @@ function resizeCanvas() {
     const canvasWidth = user === "phone" ? VIEWPORT_WIDTH : WORLD_WIDTH;
     const canvasHeight = user === "phone" ? VIEWPORT_HEIGHT : WORLD_HEIGHT;
 
+    // Use devicePixelRatio for crisp rendering on high-DPI screens
+    dpr = window.devicePixelRatio || 1;
     canvas.style.width = canvasWidth + "px";
     canvas.style.height = canvasHeight + "px";
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = Math.floor(canvasWidth * dpr);
+    canvas.height = Math.floor(canvasHeight * dpr);
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 Shop_Button.addEventListener("click", function () {
     if (state !== "playing") return; 
@@ -523,8 +543,9 @@ function End_Turn() {
     enemy.startX = enemy.x;
     enemy.startY = enemy.y;
 
-    let dy = You.offsetTop - enemy.y;
-    let dx = You.offsetLeft - enemy.x;
+    // use player world coordinates
+    let dy = playerY - enemy.y;
+    let dx = playerX - enemy.x;
 
 
     let moveX = 0;
@@ -668,6 +689,9 @@ let cost = 1;
     preview.style.top  = (worldY - cameraY) + "px";
     
     square.style.display = "none";
+    // store preview world pos for later when placing player
+    preview.dataset.worldX = worldX;
+    preview.dataset.worldY = worldY;
     const youRect = You.getBoundingClientRect();
     enemies.forEach(enemy => {
         const enemyRect = enemy.element.getBoundingClientRect();
@@ -705,8 +729,8 @@ You.addEventListener("click", () => {
     if (state !== "playing") return;
     square.style.display = "block";
 
-    const pX = You.offsetLeft;
-    const pY = You.offsetTop;
+    const pX = playerX - cameraX;
+    const pY = playerY - cameraY;
 
     const sqW = square.offsetWidth;
     const sqH = square.offsetHeight;
@@ -736,11 +760,14 @@ preview.addEventListener("click", (event) => {
     });
 
     
-    const worldX = preview.offsetLeft + cameraX;
-    const worldY = preview.offsetTop + cameraY;
+    const worldX = Number(preview.dataset.worldX) || (preview.offsetLeft + cameraX);
+    const worldY = Number(preview.dataset.worldY) || (preview.offsetTop + cameraY);
     const clamped = clampPlayerPosition(worldX, worldY);
-    You.style.left = (clamped.x - cameraX) + "px";
-    You.style.top  = (clamped.y - cameraY) + "px";
+    // update player world coords then position element with camera offset
+    playerX = clamped.x;
+    playerY = clamped.y;
+    You.style.left = (playerX - cameraX) + "px";
+    You.style.top  = (playerY - cameraY) + "px";
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
@@ -1060,14 +1087,23 @@ window.addEventListener("resize", resizeCanvas);
 updateEndButtonState();
 resizeCanvas();
 
+// Initialize player world position centered in the world
+playerX = Math.floor(WORLD_WIDTH / 2);
+playerY = Math.floor(WORLD_HEIGHT / 2);
+You.style.left = (playerX - cameraX) + "px";
+You.style.top = (playerY - cameraY) + "px";
+
 
 if (user === "phone") {
-    document.addEventListener("touchstart", (e) => {
+    // Use capture so touches are intercepted before UI elements
+    window.addEventListener("touchstart", (e) => {
+        if (!e.touches || e.touches.length === 0) return;
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
-    }, { passive: false });
+    }, { passive: false, capture: true });
     
-    document.addEventListener("touchmove", (e) => {
+    window.addEventListener("touchmove", (e) => {
+        if (!e.touches || e.touches.length === 0) return;
         if (state !== "playing" || mode !== "moving") return;
         
         const touchX = e.touches[0].clientX;
@@ -1079,7 +1115,7 @@ if (user === "phone") {
         cameraX += deltaX;
         cameraY += deltaY;
         
-       
+        // Clamp camera so you can't pan beyond the world
         cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
         cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
         
@@ -1087,7 +1123,16 @@ if (user === "phone") {
         touchStartY = touchY;
         
         e.preventDefault();
-    }, { passive: false });
+    }, { passive: false, capture: true });
+    
+    window.addEventListener("touchend", (e) => {
+        touchStartX = 0;
+        touchStartY = 0;
+    }, { passive: true, capture: true });
+    window.addEventListener("touchcancel", (e) => {
+        touchStartX = 0;
+        touchStartY = 0;
+    }, { passive: true, capture: true });
 }
 
 draw();
