@@ -736,9 +736,11 @@ preview.addEventListener("click", (event) => {
     });
 
     
-    const clamped = clampPlayerPosition(preview.offsetLeft, preview.offsetTop);
-    You.style.left = clamped.x + "px";
-    You.style.top  = clamped.y + "px";
+    const worldX = preview.offsetLeft + cameraX;
+    const worldY = preview.offsetTop + cameraY;
+    const clamped = clampPlayerPosition(worldX, worldY);
+    You.style.left = (clamped.x - cameraX) + "px";
+    You.style.top  = (clamped.y - cameraY) + "px";
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
@@ -755,6 +757,23 @@ preview.addEventListener("click", (event) => {
     }
     square.style.width = range + "px";
     square.style.height = range + "px"; 
+    
+   
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
+    const sqW = square.offsetWidth;
+    const sqH = square.offsetHeight;
+    square.style.left = (clamped.x - sqW/2 + pW/2 - cameraX) + "px";
+    square.style.top = (clamped.y - sqH/2 + pH/2 - cameraY) + "px";
+    
+
+    if (user === "phone") {
+        const centerX = clamped.x - VIEWPORT_WIDTH / 2;
+        const centerY = clamped.y - VIEWPORT_HEIGHT / 2;
+        cameraX = Math.max(0, Math.min(centerX, WORLD_WIDTH - VIEWPORT_WIDTH));
+        cameraY = Math.max(0, Math.min(centerY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+    }
+    
     preview.style.display = "none";
     
      const youRect = You.getBoundingClientRect();
@@ -836,8 +855,8 @@ if (bonus.created >= lifetime) {
 
     
 
-    bonus.element.style.left = bonus.x + "px";
-    bonus.element.style.top = bonus.y + "px";
+    bonus.element.style.left = (bonus.x - cameraX) + "px";
+    bonus.element.style.top = (bonus.y - cameraY) + "px";
     Bonuses.forEach(bonus => {
         
         const bonusRect = bonus.element.getBoundingClientRect();
