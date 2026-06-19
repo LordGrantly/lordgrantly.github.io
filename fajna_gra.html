@@ -279,25 +279,6 @@ function updateEndButtonState() {
 
 
 
-function drawHUD() {
-    ctx.save();
-
-    
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const cx = canvas.width / (2 * dpr);
-    const cy = canvas.height / (2 * dpr);
-
-   ctx.fillText(`Points: ${playerPoints}`, cx, cy - 20);
-ctx.fillText(`Turn: ${turn}`, cx, cy + 20);
-
-    ctx.restore();
-}
 function isColliding(a, b) {
     return !(
         a.right < b.left ||
@@ -790,6 +771,31 @@ if (bonus.created >= lifetime) {
 
     bonus.element.style.left = bonus.x + "px";
     bonus.element.style.top = bonus.y + "px";
+    Bonuses.forEach(bonus => {
+        
+        const bonusRect = bonus.element.getBoundingClientRect();
+        const youRect = You.getBoundingClientRect();
+        if (isColliding(youRect, bonusRect)) {
+            bonus.element.remove();
+            playerPoints += bonus.amount;
+            const div = document.createElement("div");
+            document.body.appendChild(div);
+            div.style.position = "absolute";
+            div.style.left = bonusRect.left + "px";
+            div.style.top = (bonusRect.top- 40) + "px";
+            div.textContent = "+" + bonus.amount;
+            div.style.fontSize = "40px";
+            div.style.fontWeight = "bold";
+            div.style.color = "pink";
+            setTimeout(() => {
+                div.remove();
+            }, 1000);
+            Points_Display.textContent = "Points: " + playerPoints;
+            
+            
+            
+            Bonuses.splice(Bonuses.indexOf(bonus), 1);
+        }});
 
     
 }
@@ -933,7 +939,7 @@ if (bonus.created >= lifetime) {
             ctx.lineTo(cross.x, cross.y + size);
             ctx.stroke();
         });
-          drawHUD();
+       
         if (finish && state === "waiting") {
             state = "playing";
         }
