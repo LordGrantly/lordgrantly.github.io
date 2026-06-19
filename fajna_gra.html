@@ -7,12 +7,13 @@
     <style>
       canvas {
     position: fixed;
-    left: 0;
+    left: 1;
     top: 0;
     width: 100vw;
     height: 100vh;
     touch-action: none;
     z-index: 0;
+    border: 1px solid rgb(99, 11, 11);    
 }
 
         #pe {
@@ -82,25 +83,39 @@
 #Shop_Offerings {
     display: none;
     z-index: 10;
-
     position: fixed;
     right: 30px;
     bottom: 100px;
-
-    width: 400px;
-
+    width: min(90vw, 400px);
+    max-height: 80vh;
+    overflow-y: auto;
     background: rgba(30, 30, 30, 0.95);
     border: 3px solid #555;
     border-radius: 16px;
-
     padding: 12px;
-
     backdrop-filter: blur(6px);
-
-  
-
     font-family: Arial, sans-serif;
     color: white;
+}
+
+@media (max-width: 600px) {
+    #Shop_Button {
+        width: min(90vw, 180px);
+    }
+    #Shop_Offerings {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 90vw;
+        bottom: 90px;
+    }
+    #Shop_Offerings h2 {
+        font-size: 1rem;
+    }
+    #Shop_Offerings div,
+    #Shop_Offerings button {
+        font-size: 1rem;
+    }
 }
     #End_Button{
             display: block;
@@ -236,8 +251,8 @@ let enemy_Max_points = 2;
 let enemy_points = 2;
 let mode = "moving";
 let fast_chance = 20;
-let slow_chance = 40;
-let bigger_chance = 50;
+let slow_chance = 40; //20 + 20
+let bigger_chance = 50; //20 + 20 + 10
 let range = 200;
 let true_range = range ;
 let frosen = false;
@@ -245,6 +260,7 @@ let playerPoints = 10;
 let PointsInc = 1;
 let state = "playing";
 let endTurnEnabled = true;
+let Enemy_scaling = 5;
 const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 25,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
@@ -272,12 +288,23 @@ function updateEndButtonState() {
         End_Button.style.opacity = '1';
         End_Button.style.pointerEvents = 'auto';
     } else {
-        End_Button.style.opacity = '0.4';
+        End_Button.style.opacity = '0.1';
         End_Button.style.pointerEvents = 'none';
     }
 }
 
-
+function clampPlayerPosition(x, y) {
+    const playerWidth = You.offsetWidth;
+    const playerHeight = You.offsetHeight;
+    const minX = 0;
+    const minY = 0;
+    const maxX = WORLD_WIDTH - playerWidth;
+    const maxY = WORLD_HEIGHT - playerHeight;
+    return {
+        x: Math.min(Math.max(x, minX), maxX),
+        y: Math.min(Math.max(y, minY), maxY)
+    };
+}
 
 function isColliding(a, b) {
     return !(
@@ -332,7 +359,7 @@ function updateShop() {
     
     title.textContent = "Points: " + playerPoints  ;
 
-    // Shop toggle for main End Turn button
+   
     const toggleContainer = document.createElement('div');
     toggleContainer.style.display = 'flex';
     toggleContainer.style.flexDirection = 'column';
@@ -568,7 +595,7 @@ let cost = 1;
     enemy_points -= cost;
     addCross(Enemy_Type, form);
     }
-    Enemy_step += 5;
+    Enemy_step += Enemy_scaling;
     offerings.forEach(offering => {
 
         offering.name = offering.name_change();
@@ -670,8 +697,9 @@ preview.addEventListener("click", (event) => {
     });
 
     
-    You.style.left =  preview.offsetLeft + "px";
-    You.style.top  =  preview.offsetTop + "px";
+    const clamped = clampPlayerPosition(preview.offsetLeft, preview.offsetTop);
+    You.style.left = clamped.x + "px";
+    You.style.top  = clamped.y + "px";
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
