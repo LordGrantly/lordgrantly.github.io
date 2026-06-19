@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+      body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
       canvas {
     position: fixed;
     left: 1;
@@ -236,9 +241,14 @@ const Turns_Display = document.getElementById("pe");
 const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
-let WORLD_WIDTH = window.innerWidth;
-let WORLD_HEIGHT = window.innerHeight;
+
 let dpr = 1;
+let cameraX = 0;
+let cameraY = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let VIEWPORT_WIDTH = 0;
+let VIEWPORT_HEIGHT = 0;
 let bonus_spawned = false;
 let bonus_chance = 10;
 let Enemy_step = 160;
@@ -323,19 +333,43 @@ function device_check() {
         user = "pc";
     }
 }
-function resizeCanvas() {
+function setCanvas() {
+    canvas = document.getElementById("mycanvas");
     
+    ctx = canvas.getContext("2d");
+    VIEWPORT_WIDTH = window.innerWidth;
+    VIEWPORT_HEIGHT = window.innerHeight;
+    
+    if (user === "pc") {
         WORLD_WIDTH = window.innerWidth;
         WORLD_HEIGHT = window.innerHeight;
-   
-    // WORLD_WIDTH = window.innerWidth;
-    // WORLD_HEIGHT = window.innerHeight;
+    } else {
+        WORLD_WIDTH = 2000;
+        WORLD_HEIGHT = 2000;
+    }
+    
+}
+function resizeCanvas() {
+    VIEWPORT_WIDTH = window.innerWidth;
+    VIEWPORT_HEIGHT = window.innerHeight;
+    
+    if (user === "pc") {
+        WORLD_WIDTH = window.innerWidth;
+        WORLD_HEIGHT = window.innerHeight;
+    } else {
+        WORLD_WIDTH = 2000;
+        WORLD_HEIGHT = 2000;
+    }
 
-    canvas.style.width = WORLD_WIDTH + "px";
-    canvas.style.height = WORLD_HEIGHT + "px";
+    // Phone users see viewport size, PC users see world size
+    const canvasWidth = user === "phone" ? VIEWPORT_WIDTH : WORLD_WIDTH;
+    const canvasHeight = user === "phone" ? VIEWPORT_HEIGHT : WORLD_HEIGHT;
 
-    canvas.width = WORLD_WIDTH;
-    canvas.height = WORLD_HEIGHT;
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
@@ -629,8 +663,8 @@ let cost = 1;
     const pW = You.offsetWidth;
     const pH = You.offsetHeight;
 
-    preview.style.left = (TpX - pW/2 + square.offsetLeft) + "px";
-    preview.style.top  = (TpY - pH/2 + square.offsetTop) + "px";
+    preview.style.left = (TpX - pW/2 + square.offsetLeft - cameraX) + "px";
+    preview.style.top  = (TpY - pH/2 + square.offsetTop - cameraY) + "px";
     
     square.style.display = "none";
     const youRect = You.getBoundingClientRect();
@@ -1005,6 +1039,37 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 updateEndButtonState();
 resizeCanvas();
+
+// Add touch panning for phone users
+if (user === "phone") {
+    document.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: false });
+    
+    document.addEventListener("touchmove", (e) => {
+        if (state !== "playing" || mode !== "moving") return;
+        
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        
+        const deltaX = touchStartX - touchX;
+        const deltaY = touchStartY - touchY;
+        
+        cameraX += deltaX;
+        cameraY += deltaY;
+        
+        // Clamp camera so you can't pan beyond the world
+        cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
+        cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+        
+        touchStartX = touchX;
+        touchStartY = touchY;
+        
+        e.preventDefault();
+    }, { passive: false });
+}
+
 draw();
 </script>
 </body>
