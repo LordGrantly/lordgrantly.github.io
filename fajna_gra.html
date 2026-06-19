@@ -361,7 +361,7 @@ function resizeCanvas() {
         WORLD_HEIGHT = 2000;
     }
 
-    // Phone users see viewport size, PC users see world size
+   
     const canvasWidth = user === "phone" ? VIEWPORT_WIDTH : WORLD_WIDTH;
     const canvasHeight = user === "phone" ? VIEWPORT_HEIGHT : WORLD_HEIGHT;
 
@@ -656,15 +656,16 @@ let cost = 1;
     if (Turns <= 0) return;
     if (state !== "playing") return;
     preview.style.display = "block";
-    const rect = square.getBoundingClientRect();
-    const TpX = event.clientX - rect.left;
-    const TpY = event.clientY - rect.top;
 
     const pW = You.offsetWidth;
     const pH = You.offsetHeight;
 
-    preview.style.left = (TpX - pW/2 + square.offsetLeft - cameraX) + "px";
-    preview.style.top  = (TpY - pH/2 + square.offsetTop - cameraY) + "px";
+
+    const worldX = event.clientX + cameraX - pW/2;
+    const worldY = event.clientY + cameraY - pH/2;
+    
+    preview.style.left = (worldX - cameraX) + "px";
+    preview.style.top  = (worldY - cameraY) + "px";
     
     square.style.display = "none";
     const youRect = You.getBoundingClientRect();
@@ -876,8 +877,8 @@ if (bonus.created >= lifetime) {
                 enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
                 enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
 
-                enemy.element.style.left = enemy.x + "px";
-                enemy.element.style.top = enemy.y + "px";                                
+                enemy.element.style.left = (enemy.x - cameraX) + "px";
+                enemy.element.style.top = (enemy.y - cameraY) + "px";                                
                 if (enemy.type === "slower") {
                     const areaSize = 300;
                     let area = enemy.element.area;
@@ -890,8 +891,8 @@ if (bonus.created >= lifetime) {
                         
                     }
                     
-                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2) + "px";
-                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2) + "px";
+                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2 - cameraX) + "px";
+                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2 - cameraY) + "px";
                     const YouRect = You.getBoundingClientRect();
                     
                     if(isColliding(YouRect, area.getBoundingClientRect())) {
@@ -999,10 +1000,10 @@ if (bonus.created >= lifetime) {
             ctx.lineWidth = 4;
 
             ctx.beginPath();
-            ctx.moveTo(cross.x, cross.y);
-            ctx.lineTo(cross.x + size, cross.y + size);
-            ctx.moveTo(cross.x + size, cross.y);
-            ctx.lineTo(cross.x, cross.y + size);
+            ctx.moveTo(cross.x - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x + size - cameraX, cross.y + size - cameraY);
+            ctx.moveTo(cross.x + size - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x - cameraX, cross.y + size - cameraY);
             ctx.stroke();
         });
        
@@ -1040,7 +1041,7 @@ window.addEventListener("resize", resizeCanvas);
 updateEndButtonState();
 resizeCanvas();
 
-// Add touch panning for phone users
+
 if (user === "phone") {
     document.addEventListener("touchstart", (e) => {
         touchStartX = e.touches[0].clientX;
@@ -1059,7 +1060,7 @@ if (user === "phone") {
         cameraX += deltaX;
         cameraY += deltaY;
         
-        // Clamp camera so you can't pan beyond the world
+       
         cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
         cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
         
