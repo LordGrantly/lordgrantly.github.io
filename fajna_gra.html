@@ -336,6 +336,11 @@ function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
         End_Button.style.display = "block";
         user = "phone";
+        Enemy_scaling = 2;
+        Enemy_step = 120;
+        offerings[6].effect = () => { Enemy_step -= 30; };
+        offerings[6].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        offerings[6].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
     }else{
         End_Button.style.display = "none";
         user = "pc";
