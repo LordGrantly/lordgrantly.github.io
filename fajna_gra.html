@@ -259,6 +259,7 @@ const square = document.getElementById("square");
 let dpr = 1;
 let cameraX = 0;
 let cameraY = 0;
+let user = "pc";
 let VIEWPORT_WIDTH = 0;
 let VIEWPORT_HEIGHT = 0;
 let playerX = 0;
@@ -863,6 +864,25 @@ function draw() {
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let finish = true;
+
+        You.style.left = (playerX - cameraX) + "px";
+        You.style.top = (playerY - cameraY) + "px";
+
+        if (square.style.display !== "none") {
+            const pW = You.offsetWidth;
+            const pH = You.offsetHeight;
+            const sqW = square.offsetWidth;
+            const sqH = square.offsetHeight;
+            square.style.left = (playerX - cameraX - (sqW - pW) / 2) + "px";
+            square.style.top = (playerY - cameraY - (sqH - pH) / 2) + "px";
+        }
+        
+        if (preview.style.display !== "none") {
+            const worldX = Number(preview.dataset.worldX) || (preview.offsetLeft + cameraX);
+            const worldY = Number(preview.dataset.worldY) || (preview.offsetTop + cameraY);
+            preview.style.left = (worldX - cameraX) + "px";
+            preview.style.top = (worldY - cameraY) + "px";
+        }
         
         for (let i = Bonuses.length - 1; i >= 0; i--) {
 
@@ -1092,86 +1112,81 @@ You.style.left = (playerX - cameraX) + "px";
 You.style.top = (playerY - cameraY) + "px";
 
 
-if (user === "phone") {
-    let isPanning = false;
-    let panLastX = 0;
-    let panLastY = 0;
+let isPanning = false;
+let panLastX = 0;
+let panLastY = 0;
 
-    function startPan(x, y) {
-        if (state !== "playing" || mode !== "moving") return false;
-        isPanning = true;
-        panLastX = x;
-        panLastY = y;
-        return true;
-    }
-
-    function movePan(x, y) {
-        if (!isPanning) return;
-        const deltaX = panLastX - x;
-        const deltaY = panLastY - y;
-        panLastX = x;
-        panLastY = y;
-        cameraX = Math.max(0, Math.min(cameraX + deltaX, WORLD_WIDTH - VIEWPORT_WIDTH));
-        cameraY = Math.max(0, Math.min(cameraY + deltaY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
-    }
-
-    function endPan() {
-        isPanning = false;
-    }
-
-    function shouldIgnorePan(target) {
-        if (!target || !target.id) return false;
-        return ['Shop_Button', 'Shop_Offerings', 'End_Button', 'preview', 'square', 'You'].includes(target.id);
-    }
-
-    window.addEventListener('pointerdown', (e) => {
-        if (e.pointerType !== 'touch' || shouldIgnorePan(e.target)) return;
-        if (startPan(e.clientX, e.clientY)) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    window.addEventListener('pointermove', (e) => {
-        if (e.pointerType !== 'touch') return;
-        movePan(e.clientX, e.clientY);
-        if (isPanning) e.preventDefault();
-    }, { passive: false });
-
-    window.addEventListener('pointerup', (e) => {
-        if (e.pointerType !== 'touch') return;
-        endPan();
-    }, { passive: true });
-
-    window.addEventListener('pointercancel', (e) => {
-        if (e.pointerType !== 'touch') return;
-        endPan();
-    }, { passive: true });
-
-    window.addEventListener('touchstart', (e) => {
-        if (state !== "playing" || mode !== "moving" || !e.touches || e.touches.length === 0) return;
-        const target = e.target;
-        if (shouldIgnorePan(target)) return;
-        if (startPan(e.touches[0].clientX, e.touches[0].clientY)) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    window.addEventListener('touchmove', (e) => {
-        if (!isPanning || !e.touches || e.touches.length === 0) return;
-        movePan(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
-    }, { passive: false });
-
-    window.addEventListener('touchend', (e) => {
-        if (!isPanning) return;
-        endPan();
-    }, { passive: true });
-
-    window.addEventListener('touchcancel', (e) => {
-        if (!isPanning) return;
-        endPan();
-    }, { passive: true });
+function startPan(x, y) {
+    if (state !== "playing" || mode !== "moving") return false;
+    isPanning = true;
+    panLastX = x;
+    panLastY = y;
+    return true;
 }
+
+function movePan(x, y) {
+    if (!isPanning) return;
+    const deltaX = panLastX - x;
+    const deltaY = panLastY - y;
+    panLastX = x;
+    panLastY = y;
+    cameraX = Math.max(0, Math.min(cameraX + deltaX, WORLD_WIDTH - VIEWPORT_WIDTH));
+    cameraY = Math.max(0, Math.min(cameraY + deltaY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+}
+
+function endPan() {
+    isPanning = false;
+}
+
+function shouldIgnorePan(target) {
+    if (!(target instanceof Element)) return false;
+    return !!target.closest('#Shop_Button, #Shop_Offerings, #End_Button, #preview, #square, #You');
+}
+
+window.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch' || shouldIgnorePan(e.target)) return;
+    if (startPan(e.clientX, e.clientY)) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+window.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch') return;
+    movePan(e.clientX, e.clientY);
+    if (isPanning) e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'touch') return;
+    endPan();
+}, { passive: true });
+
+window.addEventListener('pointercancel', (e) => {
+    if (e.pointerType !== 'touch') return;
+    endPan();
+}, { passive: true });
+
+window.addEventListener('touchstart', (e) => {
+    if (state !== "playing" || mode !== "moving" || !e.touches || e.touches.length === 0) return;
+    if (shouldIgnorePan(e.target)) return;
+    if (startPan(e.touches[0].clientX, e.touches[0].clientY)) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+    if (!isPanning || !e.touches || e.touches.length === 0) return;
+    movePan(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+    endPan();
+}, { passive: true });
+
+window.addEventListener('touchcancel', () => {
+    endPan();
+}, { passive: true });
 
 draw();
 </script>
