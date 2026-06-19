@@ -1098,10 +1098,11 @@ if (user === "phone") {
     let panLastY = 0;
 
     function startPan(x, y) {
-        if (state !== "playing" || mode !== "moving") return;
+        if (state !== "playing" || mode !== "moving") return false;
         isPanning = true;
         panLastX = x;
         panLastY = y;
+        return true;
     }
 
     function movePan(x, y) {
@@ -1118,10 +1119,16 @@ if (user === "phone") {
         isPanning = false;
     }
 
+    function shouldIgnorePan(target) {
+        if (!target || !target.id) return false;
+        return ['Shop_Button', 'Shop_Offerings', 'End_Button', 'preview', 'square', 'You'].includes(target.id);
+    }
+
     window.addEventListener('pointerdown', (e) => {
-        if (e.pointerType !== 'touch') return;
-        startPan(e.clientX, e.clientY);
-        e.preventDefault();
+        if (e.pointerType !== 'touch' || shouldIgnorePan(e.target)) return;
+        if (startPan(e.clientX, e.clientY)) {
+            e.preventDefault();
+        }
     }, { passive: false });
 
     window.addEventListener('pointermove', (e) => {
@@ -1137,6 +1144,31 @@ if (user === "phone") {
 
     window.addEventListener('pointercancel', (e) => {
         if (e.pointerType !== 'touch') return;
+        endPan();
+    }, { passive: true });
+
+    window.addEventListener('touchstart', (e) => {
+        if (state !== "playing" || mode !== "moving" || !e.touches || e.touches.length === 0) return;
+        const target = e.target;
+        if (shouldIgnorePan(target)) return;
+        if (startPan(e.touches[0].clientX, e.touches[0].clientY)) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isPanning || !e.touches || e.touches.length === 0) return;
+        movePan(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+        if (!isPanning) return;
+        endPan();
+    }, { passive: true });
+
+    window.addEventListener('touchcancel', (e) => {
+        if (!isPanning) return;
         endPan();
     }, { passive: true });
 }
