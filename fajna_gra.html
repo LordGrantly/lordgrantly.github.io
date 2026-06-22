@@ -338,9 +338,9 @@ function device_check() {
         user = "phone";
         Enemy_scaling = 2;
         Enemy_step = 120;
-        offerings[6].effect = () => { Enemy_step -= 30; };
-        offerings[6].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
-        offerings[6].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        offerings[5].effect = () => { Enemy_step -= 30; };
+        offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
     }else{
         End_Button.style.display = "none";
         user = "pc";
@@ -1067,34 +1067,7 @@ updateEndButtonState();
 resizeCanvas();
 
 
-if (user === "phone") {
-    document.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, { passive: false });
-    
-    document.addEventListener("touchmove", (e) => {
-        if (state !== "playing" || mode !== "moving") return;
-        
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
-        
-        const deltaX = touchStartX - touchX;
-        const deltaY = touchStartY - touchY;
-        
-        cameraX += deltaX;
-        cameraY += deltaY;
-        
-       
-        cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_WIDTH));
-        cameraY = Math.max(0, Math.min(cameraY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
-        
-        touchStartX = touchX;
-        touchStartY = touchY;
-        
-        e.preventDefault();
-    }, { passive: false });
-}
+
 
 draw();
 </script>
