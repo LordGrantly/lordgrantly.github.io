@@ -822,6 +822,11 @@ preview.addEventListener("click", (event) => {
     if (Turns <= 0) {
         
         square.style.backgroundColor = "rgba(200,0,0,0.8)";
+        square.addEventListener("click", () => {
+            
+           square.style.display = "none";
+          
+        });
     }
     state = "playing";
 });
