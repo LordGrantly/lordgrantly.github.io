@@ -567,7 +567,7 @@ enemy.targetY = enemy.y + moveY;
             state = "gameover";
             setTimeout(() => {
                 location.reload();
-                state = "playing";
+            
         }, 5000);
             
         }
@@ -672,17 +672,20 @@ let cost = 1;
     
     preview.style.left = (worldX - cameraX) + "px";
     preview.style.top  = (worldY - cameraY) + "px";
-    
-    square.style.display = "none";
-    const youRect = You.getBoundingClientRect();
+    const rect = preview.getBoundingClientRect();
     enemies.forEach(enemy => {
         const enemyRect = enemy.element.getBoundingClientRect();
-        if (isColliding(youRect, enemyRect)) {
+        if (isColliding(rect, enemyRect)) {
+            preview.style.backgroundColor= "rgba(200,0,0,0.5)";
 
-            alert("Game Over!");
-            location.reload();
-            state = "playing";
-        }});
+            
+            
+            
+        }
+
+    });
+    square.style.display = "none";
+    
     
     
 });
@@ -728,18 +731,7 @@ preview.addEventListener("click", (event) => {
     if (state !== "playing") return;
     state = "waiting";
     frosen = false;
-    const rect = preview.getBoundingClientRect();
-    enemies.forEach(enemy => {
-        const enemyRect = enemy.element.getBoundingClientRect();
-        if (isColliding(rect, enemyRect)) {
-            preview.style.backgroundColor= "rgba(200,0,0,0.5)";
-
-            
-            
-            
-        }
-
-    });
+    
 
     
     const worldX = preview.offsetLeft + cameraX;
@@ -786,9 +778,9 @@ preview.addEventListener("click", (event) => {
     enemies.forEach(enemy => {
         const enemyRect = enemy.element.getBoundingClientRect();
         if (isColliding(youRect, enemyRect)) {
-            alert("Game Over!");
+            
             location.reload();
-            state = "playing";
+      
         }});
 
    
@@ -957,7 +949,7 @@ if (bonus.created >= lifetime) {
                 state = "gameover";
                 setTimeout(() => {
                     location.reload();
-                    state = "playing";
+                  
                 }, 5000);
             }
         });
