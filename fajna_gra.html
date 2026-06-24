@@ -125,8 +125,8 @@
     #End_Button{
             display: block;
             z-index: 12;
-            width:180px;
-            height:55px;
+            width:95px;
+            height:30px;
             background-color:rgba(221, 133, 19, 0.95);
             border: 5px solid black;
             position: fixed;
@@ -136,7 +136,8 @@
             align-items:center;
             justify-content:center;
             font-weight:bold;
-            font-size:18px;
+            border-radius: 6px;
+            font-size:20px;
         }
         
     #mycanvas {
@@ -334,7 +335,7 @@ function isColliding(a, b) {
 }
 function device_check() {
     if (/Mobi|Android/i.test(navigator.userAgent)) {
-        End_Button.style.display = "block";
+        
         user = "phone";
         Enemy_scaling = 2;
         Enemy_step = 120;
@@ -342,7 +343,7 @@ function device_check() {
         offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
         offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
     }else{
-        End_Button.style.display = "none";
+        
         user = "pc";
     }
 }
