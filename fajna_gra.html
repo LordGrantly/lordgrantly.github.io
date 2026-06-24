@@ -505,6 +505,7 @@ function End_Turn() {
     if (state !== "playing") return;
     frosen = false;
     state = "waiting";
+    square.style.backgroundColor = "rgba(0,0,100,0.6)";
     turn += 1;
     
     playerPoints += PointsInc;
@@ -729,6 +730,7 @@ You.addEventListener("click", () => {
 });
 preview.addEventListener("click", (event) => {
     if (state !== "playing") return;
+    square.style.backgroundColor = "rgba(0,0,100,0.6)";
     state = "waiting";
     frosen = false;
     
