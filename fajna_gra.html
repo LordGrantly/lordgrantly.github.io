@@ -342,6 +342,9 @@ function device_check() {
         offerings[5].effect = () => { Enemy_step -= 30; };
         offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
         offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        Shop_Button.style.width = "100px";
+        Shop_Button.style.height = "40px";
+        
     }else{
         
         user = "pc";
