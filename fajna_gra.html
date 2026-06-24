@@ -506,6 +506,7 @@ function End_Turn() {
     frosen = false;
     state = "waiting";
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
+    preview.style.display = "none";
     turn += 1;
     
     playerPoints += PointsInc;
@@ -662,6 +663,7 @@ let cost = 1;
     square.addEventListener("click", (event) => {
     if (Turns <= 0) return;
     if (state !== "playing") return;
+    preview.style.backgroundColor = "rgba(26, 165, 112,0.3)";
     preview.style.display = "block";
 
     const pW = You.offsetWidth;
