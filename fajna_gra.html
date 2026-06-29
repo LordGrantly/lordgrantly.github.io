@@ -282,12 +282,12 @@ let endTurnEnabled = true;
 let Enemy_scaling = 5;
 const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
-    { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 25,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
+    { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
     { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
     { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
     { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 25, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
 ];
 const slower_areas = [];
 const Bonuses =[];
