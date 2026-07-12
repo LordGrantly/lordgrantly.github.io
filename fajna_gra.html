@@ -280,6 +280,11 @@ let PointsInc = 1;
 let state = "playing";
 let endTurnEnabled = true;
 let Enemy_scaling = 5;
+    const turnsDisplay = document.createElement("h2");
+    turnsDisplay.style.position = "absolute";
+    turnsDisplay.style.left = "10px";
+    turnsDisplay.style.top = "0px";
+    document.body.appendChild(turnsDisplay);
 const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
@@ -319,6 +324,19 @@ function clampPlayerPosition(x, y) {
     const minY = 0;
     const maxX = WORLD_WIDTH - playerWidth;
     const maxY = WORLD_HEIGHT - playerHeight;
+    return {
+        x: Math.min(Math.max(x, minX), maxX),
+        y: Math.min(Math.max(y, minY), maxY)
+    };
+}
+
+function clampPreviewPosition(x, y) {
+    const previewWidth = preview.offsetWidth;
+    const previewHeight = preview.offsetHeight;
+    const minX = 0;
+    const minY = 0;
+    const maxX = Math.max(0, VIEWPORT_WIDTH - previewWidth);
+    const maxY = Math.max(0, VIEWPORT_HEIGHT - previewHeight);
     return {
         x: Math.min(Math.max(x, minX), maxX),
         y: Math.min(Math.max(y, minY), maxY)
@@ -675,12 +693,12 @@ let cost = 1;
     const pW = You.offsetWidth;
     const pH = You.offsetHeight;
 
+    const screenX = event.clientX - pW / 2;
+    const screenY = event.clientY - pH / 2;
+    const clampedPreview = clampPreviewPosition(screenX, screenY);
 
-    const worldX = event.clientX + cameraX - pW/2;
-    const worldY = event.clientY + cameraY - pH/2;
-    
-    preview.style.left = (worldX - cameraX) + "px";
-    preview.style.top  = (worldY - cameraY) + "px";
+    preview.style.left = clampedPreview.x + "px";
+    preview.style.top  = clampedPreview.y + "px";
     const rect = preview.getBoundingClientRect();
     enemies.forEach(enemy => {
         const enemyRect = enemy.element.getBoundingClientRect();
@@ -694,6 +712,7 @@ let cost = 1;
 
     });
     square.style.display = "none";
+    preview.style.pointerEvents = "auto";
     
     
     
@@ -721,7 +740,16 @@ const y = Math.random() * (WORLD_HEIGHT - 32);
 
 You.addEventListener("click", () => {
     if (state !== "playing") return;
-    square.style.display = "block";
+
+    const squareVisible = window.getComputedStyle(square).display !== "none";
+
+    if (!squareVisible) {
+        square.style.display = "block";
+        preview.style.pointerEvents = "none";
+    } else {
+        square.style.display = "none";
+        preview.style.pointerEvents = "auto";
+    }
 
     const pX = You.offsetLeft;
     const pY = You.offsetTop;
@@ -749,6 +777,10 @@ preview.addEventListener("click", (event) => {
     const clamped = clampPlayerPosition(worldX, worldY);
     You.style.left = (clamped.x - cameraX) + "px";
     You.style.top  = (clamped.y - cameraY) + "px";
+    
+   
+    
+    
     const YouRect = You.getBoundingClientRect();    
     enemies.forEach(enemy => {
             if (enemy.element.area) {
@@ -783,6 +815,7 @@ preview.addEventListener("click", (event) => {
     }
     
     preview.style.display = "none";
+    preview.style.pointerEvents = "none";
     
      const youRect = You.getBoundingClientRect();
     enemies.forEach(enemy => {
@@ -834,6 +867,8 @@ preview.addEventListener("click", (event) => {
 });
 function draw() {
     const square = document.getElementById("square");
+    
+     turnsDisplay.textContent = Turns + "/" + Max_turns;
     
     if (Turns !== 0) square.style.backgroundColor = "rgba(0,0,100,0.6)";
     if (mode === "moving") {
