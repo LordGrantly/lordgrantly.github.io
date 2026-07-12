@@ -280,6 +280,8 @@ let PointsInc = 1;
 let state = "playing";
 let endTurnEnabled = true;
 let Enemy_scaling = 5;
+let bonus_type = "money";
+let money_bonus_chance = 75;
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
     turnsDisplay.style.left = "10px";
@@ -356,7 +358,7 @@ function device_check() {
         
         user = "phone";
         Enemy_scaling = 2;
-        Enemy_step = 120;
+        Enemy_step = 100;
         offerings[5].effect = () => { Enemy_step -= 30; };
         offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
         offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
@@ -505,14 +507,14 @@ div.addEventListener("mouseleave", () => {
 
 }
 
-function createBonusElement() {
+function createBonusElement(color) {
 
 const div = document.createElement("div");
 
 div.style.position = "absolute";
 div.style.width = "30px";
 div.style.height = "30px";
-div.style.backgroundColor = "rgba(255, 150, 200, 1)";
+div.style.backgroundColor = color;
 div.style.border = "5px solid black";
 
 
@@ -604,37 +606,67 @@ enemy.targetY = enemy.y + moveY;
     let form = Math.random()*100 < bonus_chance ? "bonus" : "enemy";
     if (form === "bonus" && !bonus_spawned) {
     bonus_spawned = true;
+    if (  Math.random() * 100 < money_bonus_chance) bonus_type = "money";
+    else bonus_type = "reset_turns";
+        
+    
+    if (bonus_type === "money") {
     Bonuses.push({
      x :Math.random() * (WORLD_WIDTH - 30),
      y : Math.random() * (WORLD_HEIGHT - 30),
-    created: 0,
+    effect: () => { playerPoints += PointsInc * 2 + Math.floor(Math.random() * 3) + 1; },
     amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
-    element: createBonusElement()
+    element: createBonusElement("pink"),
+    color: "pink",
+    type: "money"
     
 }); 
+}
+else if (bonus_type === "reset_turns" ) {
+        
+        Bonuses.push({
+            x: Math.random() * (WORLD_WIDTH - 30),
+            y: Math.random() * (WORLD_HEIGHT - 30),
+            created: 0,
+            effect: () => { Turns = Max_turns; },
+            element: createBonusElement("blue"),
+            color: "blue",
+            type: "reset_turns"
+        });
     }
+    }
+    
     
    
 Bonuses.forEach(bonus => {
         
         const bonusRect = bonus.element.getBoundingClientRect(); 
-if (isColliding(youRect, bonusRect)) { 
+if (isColliding(youRect, bonusRect)) {
             bonus.element.remove();
-            playerPoints += bonus.amount;
+            bonus.effect();
+            
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
             div.style.left = bonusRect.left + "px";
             div.style.top = (bonusRect.top- 40) + "px";
-            div.textContent = "+" + bonus.amount;
+            
             div.style.fontSize = "40px";
             div.style.fontWeight = "bold";
-            div.style.color = "pink";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
             setTimeout(() => {
                 div.remove();
             }, 1000);
-        }
-    });
+            Points_Display.textContent = "Points: " + playerPoints;
+        
+            
+            
+            Bonuses.splice(Bonuses.indexOf(bonus), 1);
+        }});
+
+
 
             Points_Display.textContent = "Points: " + playerPoints;
             let safe = 100000;
@@ -826,34 +858,38 @@ preview.addEventListener("click", (event) => {
       
         }});
 
-   
+    Turns -= 1;
 
     Bonuses.forEach(bonus => {
         
         const bonusRect = bonus.element.getBoundingClientRect();
-        if (isColliding(youRect, bonusRect)) {
+       if (isColliding(youRect, bonusRect)) {
             bonus.element.remove();
-            playerPoints += bonus.amount;
+            bonus.effect();
+            
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
             div.style.left = bonusRect.left + "px";
             div.style.top = (bonusRect.top- 40) + "px";
-            div.textContent = "+" + bonus.amount;
+            
             div.style.fontSize = "40px";
             div.style.fontWeight = "bold";
-            div.style.color = "pink";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
             setTimeout(() => {
                 div.remove();
             }, 1000);
             Points_Display.textContent = "Points: " + playerPoints;
-            
+        
             
             
             Bonuses.splice(Bonuses.indexOf(bonus), 1);
         }});
+
         square.style.display = "none";
-        Turns -= 1;
+        
     if (Turns <= 0) {
         
         square.style.backgroundColor = "rgba(200,0,0,0.8)";
@@ -911,21 +947,24 @@ if (bonus.created >= lifetime) {
         const youRect = You.getBoundingClientRect();
         if (isColliding(youRect, bonusRect)) {
             bonus.element.remove();
-            playerPoints += bonus.amount;
+            bonus.effect();
+            
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
             div.style.left = bonusRect.left + "px";
             div.style.top = (bonusRect.top- 40) + "px";
-            div.textContent = "+" + bonus.amount;
+            
             div.style.fontSize = "40px";
             div.style.fontWeight = "bold";
-            div.style.color = "pink";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
             setTimeout(() => {
                 div.remove();
             }, 1000);
             Points_Display.textContent = "Points: " + playerPoints;
-            
+        
             
             
             Bonuses.splice(Bonuses.indexOf(bonus), 1);
