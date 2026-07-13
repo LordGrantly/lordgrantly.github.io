@@ -291,15 +291,27 @@ let state = "playing";
 let endTurnEnabled = true;
 let Enemy_scaling = 5;
 
-// High Score System
+// ============================================
+// HIGH SCORE SYSTEM - Works locally and on GitHub Pages
+// ============================================
 const STORAGE_KEY = "fajna_gra_highscore";
-let highScore = localStorage.getItem(STORAGE_KEY) ? parseInt(localStorage.getItem(STORAGE_KEY)) : 0;
+let highScore = 0;
+
+function loadHighScore() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    highScore = stored ? parseInt(stored) : 0;
+    updateHighScoreDisplay();
+}
 
 function updateHighScore() {
     if (playerPoints > highScore) {
         highScore = playerPoints;
-        localStorage.setItem(STORAGE_KEY, highScore);
+        localStorage.setItem(STORAGE_KEY, highScore.toString());
+        updateHighScoreDisplay();
     }
+}
+
+function updateHighScoreDisplay() {
     HighScore_Display.textContent = "High Score: " + highScore;
 }
 
@@ -307,12 +319,13 @@ function resetHighScore() {
     if (confirm("Are you sure you want to reset the high score?")) {
         highScore = 0;
         localStorage.removeItem(STORAGE_KEY);
-        HighScore_Display.textContent = "High Score: 0";
+        updateHighScoreDisplay();
     }
 }
 
-// Initialize high score display
-updateHighScore();
+// Load high score on startup
+loadHighScore();
+// ============================================
 
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
@@ -323,10 +336,10 @@ const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
     { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
-    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})`},
+    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
-    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`},
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`},
+    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
 ];
 const slower_areas = [];
 const Bonuses =[];
@@ -998,88 +1011,98 @@ if (bonus.created >= lifetime) {
             Points_Display.textContent = "Points: " + playerPoints;
             
             
-            
             Bonuses.splice(Bonuses.indexOf(bonus), 1);
-        }});
-
-    
-}
-}
-        enemies.forEach(enemy => {
-            if (enemy.progress < 1) {
-                finish = false;
-                enemy.progress += enemy.speed * enemy.multi;
-
-                if (enemy.progress > 1) enemy.progress = 1;
-
-                enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
-                enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
-
-                enemy.element.style.left = (enemy.x - cameraX) + "px";
-                enemy.element.style.top = (enemy.y - cameraY) + "px";                                
-                if (enemy.type === "slower") {
-                    const areaSize = 300;
-                    let area = enemy.element.area;
-                    if (!area) {
-                        area = document.createElement("div");
-                        area.className = "slower_area";
-                        document.body.appendChild(area);
-                        enemy.element.area = area;
-                        
-                        
-                    }
-                    
-                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2 - cameraX) + "px";
-                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2 - cameraY) + "px";
-                    const YouRect = You.getBoundingClientRect();
-                    
-                    if(isColliding(YouRect, area.getBoundingClientRect())) {
-                        frosen = true;
-                    } 
-                    if (frosen) {
-                        range = true_range * 0.5 + 50;
-                        
-                    } else {
-                        range = true_range;
-                    }
-                    square.style.width = range + "px";
-                    square.style.height = range + "px";
-                    const pX = You.offsetLeft;
-                    const pY = You.offsetTop;
-
-                    const sqW = square.offsetWidth;
-                    const sqH = square.offsetHeight;
-                    const pW = You.offsetWidth;
-                    const pH = You.offsetHeight;
-
-                    square.style.left = (pX - (sqW - pW) / 2) + "px";
-                    square.style.top  = (pY - (sqH - pH) / 2) + "px";
-                }
-            }
-        });
-
-        const youRect = You.getBoundingClientRect();
-        enemies.forEach(enemy => {
-            const enemyRect = enemy.element.getBoundingClientRect();
-            if (isColliding(youRect, enemyRect)) {
-                state = "gameover";
-                updateHighScore();
-                setTimeout(() => {
-                    location.reload();
-                  
-                }, 5000);
-            }
-        });
-
-        if (finish) {
-            console.log("finished animation");
         }
-    }
+    });
+}
 }
 
-window.addEventListener("resize", resizeCanvas);
+let finish2 = true;
+
+for (let i = crosses.length - 1; i >= 0; i--) {
+    
+    const cross = crosses[i];
+    
+    if (cross.form === "bonus") {
+        continue;
+    }
+    
+    if (cross.clicked >= lifetime) {
+        
+        cross.element.remove();
+        crosses.splice(i, 1);
+        continue;
+    }
+    
+    if (!cross.element) {
+        
+        const div = document.createElement("div");
+        div.className = cross.type;
+        document.body.appendChild(div);
+        cross.element = div;
+    }
+    
+    cross.element.style.left = (cross.x - cameraX) + "px";
+    cross.element.style.top = (cross.y - cameraY) + "px";
+    
+    finish2 = false;
+}
+
+let finish3 = true;
+
+for (let i = enemies.length - 1; i >= 0; i--) {
+    
+    const enemy = enemies[i];
+    
+    if (enemy.progress < 1) {
+        enemy.progress += 0.05;
+    }
+    
+    const currentX = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+    const currentY = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+    
+    enemy.x = currentX;
+    enemy.y = currentY;
+    
+    enemy.element.style.left = (enemy.x - cameraX) + "px";
+    enemy.element.style.top = (enemy.y - cameraY) + "px";
+    
+    if (enemy.element.area) {
+        enemy.element.area.style.left = (enemy.x - 130 - cameraX) + "px";
+        enemy.element.area.style.top = (enemy.y - 130 - cameraY) + "px";
+    }
+    
+    finish3 = false;
+}
+
+        
+    }
+    
+    if (mode === "shop") {
+        End_Button.style.display = "none";
+        Points_Display.style.display = "none";
+        HighScore_Display.style.display = "none";
+        enemies.forEach(enemy => {
+            enemy.element.style.display = "none";
+            if (enemy.element.area) enemy.element.area.style.display = "none";
+        });
+        Bonuses.forEach(bonus => {
+            bonus.element.style.display = "none";
+        });
+        Shop_Offerings.style.display = "block";
+        You.style.display = "none";
+        square.style.display = "none";
+    }
+    
+    
+    requestAnimationFrame(draw);
+}
+
 device_check();
 setCanvas();
 resizeCanvas();
-requestAnimationFrame(draw);
-const gameLoop = setInterval(draw, 1000 / 60);
+draw();
+window.addEventListener('resize', resizeCanvas);
+</script>
+</body>
+</html>
