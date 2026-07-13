@@ -34,6 +34,14 @@
     font-weight: bold;
     font-size: 18px;
 }
+#HighScore {
+    position: absolute;
+    left: 47.1%;
+    top: 60px;
+    font-weight: bold;
+    font-size: 16px;
+    color: gold;
+}
 #Bonus {
     display: none;
     position: absolute;
@@ -148,7 +156,7 @@
         }
 
     
-    #You, #preview, #square, #Points, #pe {
+    #You, #preview, #square, #Points, #pe, #HighScore {
             z-index: 11;
             position: absolute;
         }
@@ -241,9 +249,11 @@
 <canvas id="mycanvas"></canvas>
 <div id="You"></div>
 <h3 id="Points">Points: 10</h3>
+<h3 id="HighScore">High Score: 0</h3>
 <script>
 let turn = 0;
 const Points_Display = document.getElementById("Points");
+const HighScore_Display = document.getElementById("HighScore");
 const Shop_Button = document.getElementById("Shop_Button");
 const preview = document.getElementById("preview"); 
 const Turns_Display = document.getElementById("pe");
@@ -280,6 +290,30 @@ let PointsInc = 1;
 let state = "playing";
 let endTurnEnabled = true;
 let Enemy_scaling = 5;
+
+// High Score System
+const STORAGE_KEY = "fajna_gra_highscore";
+let highScore = localStorage.getItem(STORAGE_KEY) ? parseInt(localStorage.getItem(STORAGE_KEY)) : 0;
+
+function updateHighScore() {
+    if (playerPoints > highScore) {
+        highScore = playerPoints;
+        localStorage.setItem(STORAGE_KEY, highScore);
+    }
+    HighScore_Display.textContent = "High Score: " + highScore;
+}
+
+function resetHighScore() {
+    if (confirm("Are you sure you want to reset the high score?")) {
+        highScore = 0;
+        localStorage.removeItem(STORAGE_KEY);
+        HighScore_Display.textContent = "High Score: 0";
+    }
+}
+
+// Initialize high score display
+updateHighScore();
+
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
     turnsDisplay.style.left = "10px";
@@ -289,10 +323,10 @@ const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
     { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
-    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
+    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})`},
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
-    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
+    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`},
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`},
 ];
 const slower_areas = [];
 const Bonuses =[];
@@ -461,6 +495,36 @@ function updateShop() {
     toggleContainer.appendChild(toggleButton);
     Shop_Offerings.appendChild(toggleContainer);
 
+    // Add High Score Reset Button
+    const hsContainer = document.createElement('div');
+    hsContainer.style.display = 'flex';
+    hsContainer.style.flexDirection = 'column';
+    hsContainer.style.gap = '8px';
+    hsContainer.style.marginBottom = '12px';
+
+    const hsLabel = document.createElement('div');
+    hsLabel.textContent = `High Score: ${highScore}`;
+    hsLabel.style.color = 'gold';
+    hsLabel.style.fontSize = '16px';
+    hsLabel.style.fontWeight = 'bold';
+
+    const hsResetButton = document.createElement('button');
+    hsResetButton.textContent = 'Reset High Score';
+    hsResetButton.style.padding = '10px';
+    hsResetButton.style.background = '#7a3d20';
+    hsResetButton.style.color = 'white';
+    hsResetButton.style.border = '2px solid #111';
+    hsResetButton.style.borderRadius = '12px';
+    hsResetButton.style.cursor = 'pointer';
+    hsResetButton.style.fontSize = '14px';
+    hsResetButton.style.fontWeight = 'bold';
+
+    hsResetButton.addEventListener('click', resetHighScore);
+
+    hsContainer.appendChild(hsLabel);
+    hsContainer.appendChild(hsResetButton);
+    Shop_Offerings.appendChild(hsContainer);
+
     Shop_Offerings.appendChild(title);
     offerings.forEach(offering => {
         const div = document.createElement("div");
@@ -496,6 +560,7 @@ div.addEventListener("mouseleave", () => {
                 offering.cost = Math.floor(offering.cost * offering.multi);
                 div.textContent = `${offering.name} (${offering.cost} points)`;
                 title.textContent = "Points: " + playerPoints  ;
+                updateHighScore();
                 updateShop();
             }
         });
@@ -534,6 +599,7 @@ function End_Turn() {
     turn += 1;
     
     playerPoints += PointsInc;
+    updateHighScore();
     enemy_points = Math.floor(enemy_Max_points);
     enemy_Max_points += 0.1;
     bonus_spawned = false;
@@ -591,6 +657,7 @@ enemy.targetY = enemy.y + moveY;
         const enemyRect = enemy.element.getBoundingClientRect();
         if (isColliding(youRect, enemyRect)) {
             state = "gameover";
+            updateHighScore();
             setTimeout(() => {
                 location.reload();
             
@@ -621,6 +688,7 @@ Bonuses.forEach(bonus => {
 if (isColliding(youRect, bonusRect)) { 
             bonus.element.remove();
             playerPoints += bonus.amount;
+            updateHighScore();
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
@@ -821,7 +889,7 @@ preview.addEventListener("click", (event) => {
     enemies.forEach(enemy => {
         const enemyRect = enemy.element.getBoundingClientRect();
         if (isColliding(youRect, enemyRect)) {
-            
+            updateHighScore();
             location.reload();
       
         }});
@@ -834,6 +902,7 @@ preview.addEventListener("click", (event) => {
         if (isColliding(youRect, bonusRect)) {
             bonus.element.remove();
             playerPoints += bonus.amount;
+            updateHighScore();
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
@@ -874,6 +943,7 @@ function draw() {
     if (mode === "moving") {
         End_Button.style.display = "block";
         Points_Display.style.display = "block";
+        HighScore_Display.style.display = "block";
         enemies.forEach(enemy => {
             enemy.element.style.display = "block";
             if (enemy.element.area) enemy.element.area.style.display = "block";
@@ -912,6 +982,7 @@ if (bonus.created >= lifetime) {
         if (isColliding(youRect, bonusRect)) {
             bonus.element.remove();
             playerPoints += bonus.amount;
+            updateHighScore();
             const div = document.createElement("div");
             document.body.appendChild(div);
             div.style.position = "absolute";
@@ -992,6 +1063,7 @@ if (bonus.created >= lifetime) {
             const enemyRect = enemy.element.getBoundingClientRect();
             if (isColliding(youRect, enemyRect)) {
                 state = "gameover";
+                updateHighScore();
                 setTimeout(() => {
                     location.reload();
                   
@@ -999,119 +1071,15 @@ if (bonus.created >= lifetime) {
             }
         });
 
-        for (let i = crosses.length - 1; i >= 0; i--) {
-            const cross = crosses[i];
-            if (cross.clicked >= lifetime) {
-                const div = document.createElement("div");
-                const cRect = canvas.getBoundingClientRect();
-
-                div.style.left = (cRect.left + cross.x) + "px";
-                div.style.top = (cRect.top + cross.y) + "px";
-                if (cross.type === "normal") {
-                div.className =  "enemy" ;
-                div.style.backgroundColor =  "green"  ;
-                }else if (cross.type === "fast") {
-                div.className =  "fast";
-                div.style.backgroundColor =   "yellow";
-                }else if(cross.type === "slower") {
-                div.className =  "slower" ;
-                div.style.backgroundColor =   "blue";
-                }else{
-                div.className =  "bigger" ;
-                div.style.backgroundColor =   "purple";
-                }
-                document.body.appendChild(div);
-
-                enemies.push({
-                    x: cross.x,
-                    y: cross.y,
-                    targetX: cross.x,
-                    targetY: cross.y,
-                    startX: cross.x,
-                    startY: cross.y,
-                    multi: cross.type === "fast" ? 1.9 : 1,
-                    type: cross.type,
-                    progress: 1,
-                    speed: 0.05,
-                    element: div,
-                });
-                enemies.forEach(enemy => {
-        
-    
-       
-        
-        const enemyRect = enemy.element.getBoundingClientRect();
-        
-        
-    });
-                crosses.splice(i, 1);
-            }
+        if (finish) {
+            console.log("finished animation");
         }
-
-    
-        crosses.forEach(cross => {
-            let size = 40   ;
-            if(cross.type === "normal") {
-                ctx.strokeStyle = "green";
-            }else if(cross.type === "fast") {
-                ctx.strokeStyle = "yellow";
-                    size = 20;
-            }else if (cross.type === "slower") {
-                ctx.strokeStyle = "blue";
-                size = 48;
-            }else {
-                ctx.strokeStyle = "purple";
-                size = 70;
-            }
-            
-            ctx.lineWidth = 4;
-
-            ctx.beginPath();
-            ctx.moveTo(cross.x - cameraX, cross.y - cameraY);
-            ctx.lineTo(cross.x + size - cameraX, cross.y + size - cameraY);
-            ctx.moveTo(cross.x + size - cameraX, cross.y - cameraY);
-            ctx.lineTo(cross.x - cameraX, cross.y + size - cameraY);
-            ctx.stroke();
-        });
-       
-        if (finish && state === "waiting") {
-            state = "playing";
-        }
-    } else {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    End_Button.style.display = "none";
-    enemies.forEach(enemy => {
-        enemy.element.style.display = "none";
-        if (enemy.element.area) enemy.element.area.style.display = "none";
-    });
-    Bonuses.forEach(bonus => {
-        bonus.element.style.display = "none";
-    });
-    You.style.display = "none";
-    square.style.display = "none";
-    preview.style.display = "none";
-    
-    
-  
-   
-   
+    }
 }
 
-    requestAnimationFrame(draw);
-}
-            
-    
+window.addEventListener("resize", resizeCanvas);
 device_check();
 setCanvas();
 resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-updateEndButtonState();
-resizeCanvas();
-
-
-
-
-draw();
-</script>
-</body>
-</html>
+requestAnimationFrame(draw);
+const gameLoop = setInterval(draw, 1000 / 60);
