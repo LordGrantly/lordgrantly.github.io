@@ -280,8 +280,8 @@ let enemy_Max_points = 2;
 let enemy_points = 2;
 let mode = "moving";
 let fast_chance = 20;
-let slow_chance = 40; //20 + 20
-let bigger_chance = 50; //20 + 20 + 10
+let slow_chance = 40;
+let bigger_chance = 50;
 let range = 200;
 let true_range = range ;
 let frosen = false;
@@ -336,10 +336,10 @@ const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
     { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
-    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
+    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})`},
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
-    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
+    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`},
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`},
 ];
 const slower_areas = [];
 const Bonuses =[];
@@ -1015,73 +1015,85 @@ if (bonus.created >= lifetime) {
         }
     });
 }
-}
-
-let finish2 = true;
-
-for (let i = crosses.length - 1; i >= 0; i--) {
-    
-    const cross = crosses[i];
-    
-    if (cross.form === "bonus") {
-        continue;
-    }
-    
-    if (cross.clicked >= lifetime) {
+        }
         
-        cross.element.remove();
-        crosses.splice(i, 1);
-        continue;
-    }
-    
-    if (!cross.element) {
-        
-        const div = document.createElement("div");
-        div.className = cross.type;
-        document.body.appendChild(div);
-        cross.element = div;
-    }
-    
-    cross.element.style.left = (cross.x - cameraX) + "px";
-    cross.element.style.top = (cross.y - cameraY) + "px";
-    
-    finish2 = false;
-}
+        for (let i = crosses.length - 1; i >= 0; i--) {
+            const cross = crosses[i];
+            if (cross.created >= lifetime) {
+                crosses.splice(i, 1);
+            } else {
+                let type_class = "enemy";
+                if (cross.type === "fast") type_class = "fast";
+                if (cross.type === "slower") type_class = "slower";
+                if (cross.type === "bigger") type_class = "bigger";
 
-let finish3 = true;
+                let element = document.querySelector(`.${type_class}[data-id="${i}"]`);
+                if (!element) {
+                    element = document.createElement("div");
+                    element.className = type_class;
+                    element.setAttribute("data-id", i);
+                    document.body.appendChild(element);
 
-for (let i = enemies.length - 1; i >= 0; i--) {
-    
-    const enemy = enemies[i];
-    
-    if (enemy.progress < 1) {
-        enemy.progress += 0.05;
-    }
-    
-    const currentX = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
-    const currentY = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
-    
-    enemy.x = currentX;
-    enemy.y = currentY;
-    
-    enemy.element.style.left = (enemy.x - cameraX) + "px";
-    enemy.element.style.top = (enemy.y - cameraY) + "px";
-    
-    if (enemy.element.area) {
-        enemy.element.area.style.left = (enemy.x - 130 - cameraX) + "px";
-        enemy.element.area.style.top = (enemy.y - 130 - cameraY) + "px";
-    }
-    
-    finish3 = false;
-}
+                    if (cross.type === "slower") {
+                        const area = document.createElement("div");
+                        area.className = "slower_area";
+                        area.setAttribute("data-id", i);
+                        document.body.appendChild(area);
+                        element.area = area;
+                    }
+                }
 
-        
-    }
-    
-    if (mode === "shop") {
+                element.style.left = (cross.x - cameraX) + "px";
+                element.style.top = (cross.y - cameraY) + "px";
+
+                if (element.area) {
+                    element.area.style.left = (cross.x - cameraX - 130) + "px";
+                    element.area.style.top = (cross.y - cameraY - 130) + "px";
+                }
+
+                enemies.push({
+                    x: cross.x,
+                    y: cross.y,
+                    type: cross.type,
+                    element: element,
+                    targetX: cross.x,
+                    targetY: cross.y,
+                    startX: cross.x,
+                    startY: cross.y,
+                    progress: 0
+                });
+                crosses.splice(i, 1);
+            }
+        }
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            
+            if (!enemy.element.parentNode) {
+                enemies.splice(i, 1);
+                continue;
+            }
+
+            enemy.progress += 0.05;
+            if (enemy.progress > 1) enemy.progress = 1;
+
+            enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+            enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+
+            enemy.element.style.left = (enemy.x - cameraX) + "px";
+            enemy.element.style.top = (enemy.y - cameraY) + "px";
+
+            if (enemy.element.area) {
+                enemy.element.area.style.left = (enemy.x - cameraX - 130) + "px";
+                enemy.element.area.style.top = (enemy.y - cameraY - 130) + "px";
+            }
+        }
+
+        if (finish) {
+            requestAnimationFrame(draw);
+        }
+    } else if (mode === "shop") {
         End_Button.style.display = "none";
-        Points_Display.style.display = "none";
-        HighScore_Display.style.display = "none";
         enemies.forEach(enemy => {
             enemy.element.style.display = "none";
             if (enemy.element.area) enemy.element.area.style.display = "none";
@@ -1089,20 +1101,19 @@ for (let i = enemies.length - 1; i >= 0; i--) {
         Bonuses.forEach(bonus => {
             bonus.element.style.display = "none";
         });
-        Shop_Offerings.style.display = "block";
         You.style.display = "none";
-        square.style.display = "none";
+        Points_Display.style.display = "block";
+        HighScore_Display.style.display = "block";
+        
+        requestAnimationFrame(draw);
     }
-    
-    
-    requestAnimationFrame(draw);
 }
 
 device_check();
 setCanvas();
 resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 draw();
-window.addEventListener('resize', resizeCanvas);
 </script>
 </body>
 </html>
