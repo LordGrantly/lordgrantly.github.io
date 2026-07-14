@@ -282,6 +282,29 @@ let endTurnEnabled = true;
 let Enemy_scaling = 5;
 let bonus_type = "money";
 let money_bonus_chance = 75;
+ 
+let bestTurn = 0;
+
+function loadHighscore() {
+  const saved = parseInt(localStorage.getItem('alpha_best_turn'), 10);
+  bestTurn = Number.isFinite(saved) ? saved : 0;
+  
+}
+
+function saveHighscore() {
+  localStorage.setItem('alpha_best_turn', bestTurn);
+  
+}
+
+function maybeUpdateHighscore() {
+  if (turn > bestTurn) {
+    bestTurn = turn;
+    saveHighscore();
+    
+  }
+}
+
+loadHighscore();
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
     turnsDisplay.style.left = "10px";
@@ -540,7 +563,7 @@ function End_Turn() {
     enemy_Max_points += 0.1;
     bonus_spawned = false;
     Points_Display.textContent = "Points: " + playerPoints;
-    Turns_Display.textContent =   "Turn: " + turn; 
+    Turns_Display.textContent =   "Turn: " + turn + "    Best turn"+ bestTurn; 
     crosses.forEach(cross => {
         
         cross.clicked += 1;
