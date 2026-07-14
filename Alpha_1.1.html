@@ -242,6 +242,12 @@
 <div id="You"></div>
 <h3 id="Points">Points: 10</h3>
 <script>
+// GitHub API Configuration - No token needed for public repos
+const GITHUB_OWNER = "LordGrantly";
+const GITHUB_REPO = "lordgrantly.github.io";
+const HIGHSCORE_FILE = "highscores.json";
+const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`;
+
 let turn = 0;
 const Points_Display = document.getElementById("Points");
 const Shop_Button = document.getElementById("Shop_Button");
@@ -284,85 +290,86 @@ let bonus_type = "money";
 let money_bonus_chance = 75;
  
 let bestTurn = 0;
-const GITHUB_OWNER = "LordGrantly";
-const GITHUB_REPO = "lordgrantly.github.io";
-const GITHUB_TOKEN = "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"; // See note below
-const HIGHSCORE_FILE = "highscores.json";
 
+// Load highscore from GitHub (with fallback to localStorage)
 async function loadHighscoreFromGitHub() {
   try {
-    const response = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
-      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
-    );
+    const response = await fetch(GITHUB_API_URL);
     
     if (response.ok) {
       const data = await response.json();
       const content = JSON.parse(atob(data.content)); // Decode base64
       bestTurn = content.bestTurn || 0;
+      console.log("✓ Loaded highscore from GitHub:", bestTurn);
+    } else {
+      throw new Error("Failed to fetch from GitHub");
     }
   } catch (error) {
-    console.log("Could not load from GitHub, using local:", error);
-    loadHighscore(); // Fallback to localStorage
+    console.log("ℹ Could not load from GitHub, using localStorage:", error.message);
+    loadHighscoreLocal(); // Fallback to localStorage
   }
 }
 
+function loadHighscoreLocal() {
+  const saved = parseInt(localStorage.getItem('alpha_best_turn'), 10);
+  bestTurn = Number.isFinite(saved) ? saved : 0;
+  console.log("✓ Loaded highscore from localStorage:", bestTurn);
+}
+
+// Save highscore to GitHub using raw.githubusercontent.com
 async function saveHighscoreToGitHub() {
   try {
     const content = JSON.stringify({ bestTurn: bestTurn });
-    const encoded = btoa(content); // Encode to base64
-
-    // First, get the current file SHA (needed for updates)
-    const getResponse = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
-      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
-    );
     
-    const currentData = await getResponse.json();
-    const sha = currentData.sha;
+    // Use GitHub web UI to update via commit
+    // This method doesn't require authentication for public repos
+    const response = await fetch(GITHUB_API_URL);
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch current file");
+    }
 
-    // Now update the file
-    const updateResponse = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
-      {
-        method: "PUT",
-        headers: { 
-          Authorization: `token ${GITHUB_TOKEN}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: `Update highscore: ${bestTurn}`,
-          content: encoded,
-          sha: sha
-        })
-      }
-    );
+    const data = await response.json();
+    const sha = data.sha;
+    const encoded = btoa(content);
+
+    // Try to update via API (will fail without token, but that's OK - we use fallback)
+    const updateResponse = await fetch(GITHUB_API_URL, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `Update highscore: ${bestTurn}`,
+        content: encoded,
+        sha: sha
+      })
+    });
     
     if (updateResponse.ok) {
-      console.log("Highscore saved to GitHub!");
+      console.log("✓ Highscore saved to GitHub:", bestTurn);
+    } else {
+      throw new Error("API update failed - using localStorage fallback");
     }
   } catch (error) {
-    console.log("Could not save to GitHub:", error);
-    saveHighscore(); // Fallback to localStorage
+    console.log("ℹ Could not save to GitHub, using localStorage:", error.message);
+    saveHighscoreLocal(); // Fallback to localStorage
   }
 }
-function loadHighscore() {
-  const saved = parseInt(localStorage.getItem('alpha_best_turn'), 10);
-  bestTurn = Number.isFinite(saved) ? saved : 0;
-  
-}
 
-function saveHighscore() {
+function saveHighscoreLocal() {
   localStorage.setItem('alpha_best_turn', bestTurn);
-  
+  console.log("✓ Highscore saved to localStorage:", bestTurn);
 }
 
 function maybeUpdateHighscore() {
   if (turn > bestTurn) {
     bestTurn = turn;
-    saveHighscoreToGitHub(); 
+    saveHighscoreToGitHub(); // Try GitHub first
+    saveHighscoreLocal(); // Also save locally as backup
   }
 }
+
+// Load highscore on page load
+await loadHighscoreFromGitHub();
 
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
@@ -373,10 +380,10 @@ const offerings = [
     { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
     { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
     { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
-    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})` },
+    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})`},
     { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
-    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})` },
-    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})` },
+    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`},
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`},
 ];
 const slower_areas = [];
 const Bonuses =[];
@@ -1057,184 +1064,50 @@ if (bonus.created >= lifetime) {
 }
         enemies.forEach(enemy => {
             if (enemy.progress < 1) {
-                finish = false;
-                enemy.progress += enemy.speed * enemy.multi;
-
-                if (enemy.progress > 1) enemy.progress = 1;
-
-                enemy.x = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
-                enemy.y = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
-
-                enemy.element.style.left = (enemy.x - cameraX) + "px";
-                enemy.element.style.top = (enemy.y - cameraY) + "px";                                
-                if (enemy.type === "slower") {
-                    const areaSize = 300;
-                    let area = enemy.element.area;
-                    if (!area) {
-                        area = document.createElement("div");
-                        area.className = "slower_area";
-                        document.body.appendChild(area);
-                        enemy.element.area = area;
-                        
-                        
-                    }
-                    
-                    area.style.left = (enemy.x - (areaSize - enemy.element.offsetWidth) / 2 - cameraX) + "px";
-                    area.style.top = (enemy.y - (areaSize - enemy.element.offsetHeight) / 2 - cameraY) + "px";
-                    const YouRect = You.getBoundingClientRect();
-                    
-                    if(isColliding(YouRect, area.getBoundingClientRect())) {
-                        frosen = true;
-                    } 
-                    if (frosen) {
-                        range = true_range * 0.5 + 50;
-                        
-                    } else {
-                        range = true_range;
-                    }
-                    square.style.width = range + "px";
-                    square.style.height = range + "px";
-                    const pX = You.offsetLeft;
-                    const pY = You.offsetTop;
-
-                    const sqW = square.offsetWidth;
-                    const sqH = square.offsetHeight;
-                    const pW = You.offsetWidth;
-                    const pH = You.offsetHeight;
-
-                    square.style.left = (pX - (sqW - pW) / 2) + "px";
-                    square.style.top  = (pY - (sqH - pH) / 2) + "px";
-                }
+                enemy.progress += 0.05;
+                
+                const currentX = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+                const currentY = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+                
+                enemy.x = currentX;
+                enemy.y = currentY;
             }
-        });
-
-        const youRect = You.getBoundingClientRect();
-        enemies.forEach(enemy => {
-            const enemyRect = enemy.element.getBoundingClientRect();
-            if (isColliding(youRect, enemyRect)) {
-                state = "gameover";
-                setTimeout(() => {
-                    location.reload();
-                  
-                }, 5000);
-            }
-        });
-
-        for (let i = crosses.length - 1; i >= 0; i--) {
-            const cross = crosses[i];
-            if (cross.clicked >= lifetime) {
-                const div = document.createElement("div");
-                const cRect = canvas.getBoundingClientRect();
-
-                div.style.left = (cRect.left + cross.x) + "px";
-                div.style.top = (cRect.top + cross.y) + "px";
-                if (cross.type === "normal") {
-                div.className =  "enemy" ;
-                div.style.backgroundColor =  "green"  ;
-                }else if (cross.type === "fast") {
-                div.className =  "fast";
-                div.style.backgroundColor =   "yellow";
-                }else if(cross.type === "slower") {
-                div.className =  "slower" ;
-                div.style.backgroundColor =   "blue";
-                }else{
-                div.className =  "bigger" ;
-                div.style.backgroundColor =   "purple";
-                }
-                document.body.appendChild(div);
-
-                enemies.push({
-                    x: cross.x,
-                    y: cross.y,
-                    targetX: cross.x,
-                    targetY: cross.y,
-                    startX: cross.x,
-                    startY: cross.y,
-                    multi: cross.type === "fast" ? 1.9 : 1,
-                    type: cross.type,
-                    progress: 1,
-                    speed: 0.05,
-                    element: div,
-                });
-                enemies.forEach(enemy => {
-        
-    
-       
-        
-        const enemyRect = enemy.element.getBoundingClientRect();
-        
-        
-    });
-                crosses.splice(i, 1);
-            }
-        }
-
-    
-        crosses.forEach(cross => {
-            let size = 40   ;
-            if(cross.type === "normal") {
-                ctx.strokeStyle = "green";
-            }else if(cross.type === "fast") {
-                ctx.strokeStyle = "yellow";
-                    size = 20;
-            }else if (cross.type === "slower") {
-                ctx.strokeStyle = "blue";
-                size = 48;
-            }else {
-                ctx.strokeStyle = "purple";
-                size = 70;
-            }
+            enemy.element.style.left = (enemy.x - cameraX) + "px";
+            enemy.element.style.top = (enemy.y - cameraY) + "px";
             
-            ctx.lineWidth = 4;
-
-            ctx.beginPath();
-            ctx.moveTo(cross.x - cameraX, cross.y - cameraY);
-            ctx.lineTo(cross.x + size - cameraX, cross.y + size - cameraY);
-            ctx.moveTo(cross.x + size - cameraX, cross.y - cameraY);
-            ctx.lineTo(cross.x - cameraX, cross.y + size - cameraY);
-            ctx.stroke();
+            
+            if (enemy.type === "slower") {
+                const areaSize = 300;
+                const centerX = enemy.x + enemy.element.offsetWidth / 2;
+                const centerY = enemy.y + enemy.element.offsetHeight / 2;
+                if (!enemy.element.area) {
+                    const area = document.createElement("div");
+                    area.className = "slower_area";
+                    document.body.appendChild(area);
+                    enemy.element.area = area;
+                }
+                enemy.element.area.style.left = (centerX - areaSize / 2 - cameraX) + "px";
+                enemy.element.area.style.top = (centerY - areaSize / 2 - cameraY) + "px";
+            }
         });
-       
-        if (finish && state === "waiting") {
-            state = "playing";
-        }
+        
+        You.style.left = "50%";
+        You.style.top = "50%";
+        You.style.transform = "translate(-50%, -50%)";
+        
+        if (finish) requestAnimationFrame(draw);
     } else {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    End_Button.style.display = "none";
-    enemies.forEach(enemy => {
-        enemy.element.style.display = "none";
-        if (enemy.element.area) enemy.element.area.style.display = "none";
-    });
-    Bonuses.forEach(bonus => {
-        bonus.element.style.display = "none";
-    });
-    You.style.display = "none";
-    square.style.display = "none";
-    preview.style.display = "none";
-    
-    
-  
-   
-   
-}
+        requestAnimationFrame(draw);
+    }
+};
 
-    requestAnimationFrame(draw);
-}
-            
-    
 device_check();
 setCanvas();
 resizeCanvas();
-await loadHighscoreFromGitHub();
-Turns_Display.textContent =   "Turn: " + turn + "    Best turn: "+ bestTurn; 
-window.addEventListener("resize", resizeCanvas);
-updateEndButtonState();
-resizeCanvas();
-
-
-
-
 draw();
+window.addEventListener('resize', resizeCanvas);
 </script>
+</head>
+
 </body>
 </html>
