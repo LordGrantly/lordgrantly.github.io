@@ -23,7 +23,7 @@
 
         #pe {
             position: absolute;
-            left: 47%;
+            left: 34%;
             
     font-weight: bold;
 }
@@ -563,7 +563,7 @@ function End_Turn() {
     enemy_Max_points += 0.1;
     bonus_spawned = false;
     Points_Display.textContent = "Points: " + playerPoints;
-    Turns_Display.textContent =   "Turn: " + turn + "    Best turn"+ bestTurn; 
+    Turns_Display.textContent =   "Turn: " + turn + "    Best turn: "+ bestTurn; 
     crosses.forEach(cross => {
         
         cross.clicked += 1;
@@ -1166,6 +1166,7 @@ if (bonus.created >= lifetime) {
 device_check();
 setCanvas();
 resizeCanvas();
+Turns_Display.textContent =   "Turn: " + turn + "    Best turn: "+ bestTurn; 
 window.addEventListener("resize", resizeCanvas);
 updateEndButtonState();
 resizeCanvas();
