@@ -557,7 +557,7 @@ function End_Turn() {
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
     preview.style.display = "none";
     turn += 1;
-    
+    maybeUpdateHighscore(); 
     playerPoints += PointsInc;
     enemy_points = Math.floor(enemy_Max_points);
     enemy_Max_points += 0.1;
