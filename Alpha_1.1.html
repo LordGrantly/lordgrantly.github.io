@@ -235,7 +235,7 @@
 <div id="Shop_Button"></div>
 <div id="Shop_Offerings"></div> 
 <div id="preview"></div>
-<h2 id="pe"><b>Turn: 0</b></h2>
+<h2 id="pe"><b>Turn: 0 | Highscore: 0</b></h2>
 <div id="square"></div>
 <div id="End_Button">End Turn</div>
 <canvas id="mycanvas"></canvas>
@@ -289,8 +289,94 @@ let Enemy_scaling = 5;
 let bonus_type = "money";
 let money_bonus_chance = 75;
  
-let bestTurn = 0;
+let highscore = 0;
+    const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
+    async function updateHighscore(){
 
+    try{
+
+        const response = await fetch(HIGH_SCORE_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                score:turn
+            })
+        });
+
+
+        const data = await response.json();
+
+
+        if(data.best){
+            highscore = data.best;
+        }
+        else if(data.score){
+            highscore = data.score;
+        }
+
+
+        Turns_Display.textContent =
+            "Turn: " + turn + " | Highscore: " + highscore;
+
+
+    }catch(error){
+
+        console.log("Highscore error:",error);
+
+    }
+}
+
+
+
+async function getHighscore(){
+
+    try{
+
+        const response = await fetch(HIGH_SCORE_URL);
+
+        const data = await response.json();
+
+        highscore = data.bestTurn;
+
+
+        Turns_Display.textContent =
+            "Turn: " + turn + " | Highscore: " + highscore;
+
+
+    }catch(error){
+
+        console.log("Could not load highscore",error);
+
+    }
+}
+async function submitHighscore(score){
+
+    try {
+
+        const response = await fetch(HIGH_SCORE_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                score:score
+            })
+        });
+
+
+        const data = await response.json();
+
+        console.log("Highscore response:", data);
+
+    } catch(error){
+
+        console.log("Highscore error:", error);
+
+    }
+
+}
 // Load highscore from GitHub (with fallback to localStorage)
 async function loadHighscoreFromGitHub() {
   try {
@@ -624,6 +710,7 @@ function End_Turn() {
     preview.style.display = "none";
     turn += 1;
     maybeUpdateHighscore(); 
+    updateHighscore();
     playerPoints += PointsInc;
     enemy_points = Math.floor(enemy_Max_points);
     enemy_Max_points += 0.1;
@@ -682,6 +769,8 @@ enemy.targetY = enemy.y + moveY;
         const enemyRect = enemy.element.getBoundingClientRect();
         if (isColliding(youRect, enemyRect)) {
             state = "gameover";
+            
+            submitHighscore(turn);
             setTimeout(() => {
                 location.reload();
             
@@ -1104,6 +1193,7 @@ if (bonus.created >= lifetime) {
 device_check();
 setCanvas();
 resizeCanvas();
+getHighscore();
 draw();
 window.addEventListener('resize', resizeCanvas);
 </script>
