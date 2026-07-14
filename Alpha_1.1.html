@@ -284,7 +284,68 @@ let bonus_type = "money";
 let money_bonus_chance = 75;
  
 let bestTurn = 0;
+const GITHUB_OWNER = "LordGrantly";
+const GITHUB_REPO = "lordgrantly.github.io";
+const GITHUB_TOKEN = "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"; // See note below
+const HIGHSCORE_FILE = "highscores.json";
 
+async function loadHighscoreFromGitHub() {
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
+    );
+    
+    if (response.ok) {
+      const data = await response.json();
+      const content = JSON.parse(atob(data.content)); // Decode base64
+      bestTurn = content.bestTurn || 0;
+    }
+  } catch (error) {
+    console.log("Could not load from GitHub, using local:", error);
+    loadHighscore(); // Fallback to localStorage
+  }
+}
+
+async function saveHighscoreToGitHub() {
+  try {
+    const content = JSON.stringify({ bestTurn: bestTurn });
+    const encoded = btoa(content); // Encode to base64
+
+    // First, get the current file SHA (needed for updates)
+    const getResponse = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
+    );
+    
+    const currentData = await getResponse.json();
+    const sha = currentData.sha;
+
+    // Now update the file
+    const updateResponse = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`,
+      {
+        method: "PUT",
+        headers: { 
+          Authorization: `token ${GITHUB_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Update highscore: ${bestTurn}`,
+          content: encoded,
+          sha: sha
+        })
+      }
+    );
+    
+    if (updateResponse.ok) {
+      console.log("Highscore saved to GitHub!");
+    }
+  } catch (error) {
+    console.log("Could not save to GitHub:", error);
+    saveHighscore(); // Fallback to localStorage
+  }
+}
 function loadHighscore() {
   const saved = parseInt(localStorage.getItem('alpha_best_turn'), 10);
   bestTurn = Number.isFinite(saved) ? saved : 0;
@@ -299,12 +360,10 @@ function saveHighscore() {
 function maybeUpdateHighscore() {
   if (turn > bestTurn) {
     bestTurn = turn;
-    saveHighscore();
-    
+    saveHighscoreToGitHub(); 
   }
 }
 
-loadHighscore();
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
     turnsDisplay.style.left = "10px";
@@ -1166,6 +1225,7 @@ if (bonus.created >= lifetime) {
 device_check();
 setCanvas();
 resizeCanvas();
+await loadHighscoreFromGitHub();
 Turns_Display.textContent =   "Turn: " + turn + "    Best turn: "+ bestTurn; 
 window.addEventListener("resize", resizeCanvas);
 updateEndButtonState();
