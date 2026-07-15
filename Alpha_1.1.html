@@ -291,7 +291,7 @@ let money_bonus_chance = 75;
  
 let highscore = 0;
     const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
-    async function updateHighscore(){
+async function updateHighscore(){
 
     try{
 
@@ -308,16 +308,19 @@ let highscore = 0;
 
         const data = await response.json();
 
+        console.log(data);
+
 
         if(data.best){
             highscore = data.best;
         }
-        else if(data.score){
+
+        if(data.score && data.score > highscore){
             highscore = data.score;
         }
 
 
-        Turns_Display.textContent =
+        Turns_Display.innerHTML =
             "Turn: " + turn + " | Highscore: " + highscore;
 
 
@@ -327,7 +330,6 @@ let highscore = 0;
 
     }
 }
-
 
 
 async function getHighscore(){
@@ -377,85 +379,9 @@ async function submitHighscore(score){
     }
 
 }
-// Load highscore from GitHub (with fallback to localStorage)
-async function loadHighscoreFromGitHub() {
-  try {
-    const response = await fetch(GITHUB_API_URL);
-    
-    if (response.ok) {
-      const data = await response.json();
-      const content = JSON.parse(atob(data.content)); // Decode base64
-      bestTurn = content.bestTurn || 0;
-      console.log("✓ Loaded highscore from GitHub:", bestTurn);
-    } else {
-      throw new Error("Failed to fetch from GitHub");
-    }
-  } catch (error) {
-    console.log("ℹ Could not load from GitHub, using localStorage:", error.message);
-    loadHighscoreLocal(); // Fallback to localStorage
-  }
-}
 
-function loadHighscoreLocal() {
-  const saved = parseInt(localStorage.getItem('alpha_best_turn'), 10);
-  bestTurn = Number.isFinite(saved) ? saved : 0;
-  console.log("✓ Loaded highscore from localStorage:", bestTurn);
-}
 
-// Save highscore to GitHub using raw.githubusercontent.com
-async function saveHighscoreToGitHub() {
-  try {
-    const content = JSON.stringify({ bestTurn: bestTurn });
-    
-    // Use GitHub web UI to update via commit
-    // This method doesn't require authentication for public repos
-    const response = await fetch(GITHUB_API_URL);
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch current file");
-    }
 
-    const data = await response.json();
-    const sha = data.sha;
-    const encoded = btoa(content);
-
-    // Try to update via API (will fail without token, but that's OK - we use fallback)
-    const updateResponse = await fetch(GITHUB_API_URL, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `Update highscore: ${bestTurn}`,
-        content: encoded,
-        sha: sha
-      })
-    });
-    
-    if (updateResponse.ok) {
-      console.log("✓ Highscore saved to GitHub:", bestTurn);
-    } else {
-      throw new Error("API update failed - using localStorage fallback");
-    }
-  } catch (error) {
-    console.log("ℹ Could not save to GitHub, using localStorage:", error.message);
-    saveHighscoreLocal(); // Fallback to localStorage
-  }
-}
-
-function saveHighscoreLocal() {
-  localStorage.setItem('alpha_best_turn', bestTurn);
-  console.log("✓ Highscore saved to localStorage:", bestTurn);
-}
-
-function maybeUpdateHighscore() {
-  if (turn > bestTurn) {
-    bestTurn = turn;
-    saveHighscoreToGitHub(); // Try GitHub first
-    saveHighscoreLocal(); // Also save locally as backup
-  }
-}
-
-// Load highscore on page load
-await loadHighscoreFromGitHub();
 
     const turnsDisplay = document.createElement("h2");
     turnsDisplay.style.position = "absolute";
@@ -709,14 +635,14 @@ function End_Turn() {
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
     preview.style.display = "none";
     turn += 1;
-    maybeUpdateHighscore(); 
+    
     updateHighscore();
     playerPoints += PointsInc;
     enemy_points = Math.floor(enemy_Max_points);
     enemy_Max_points += 0.1;
     bonus_spawned = false;
     Points_Display.textContent = "Points: " + playerPoints;
-    Turns_Display.textContent =   "Turn: " + turn + "    Best turn: "+ bestTurn; 
+    Turns_Display.textContent ="Turn: " + turn + " | Highscore: " + highscore;
     crosses.forEach(cross => {
         
         cross.clicked += 1;
