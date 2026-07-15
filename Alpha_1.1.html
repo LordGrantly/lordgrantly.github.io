@@ -1184,7 +1184,7 @@ const youRect = You.getBoundingClientRect();
             ctx.stroke();
         });
        
-        if (finish && state === "waiting") {
+        if ( state === "waiting") {
             state = "playing";
         }
     } else {
