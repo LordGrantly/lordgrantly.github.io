@@ -1185,7 +1185,8 @@ const youRect = You.getBoundingClientRect();
         });
        
         if ( state === "waiting") {
-            state = "playing";
+            const allDone = enemies.every(e => e.progress >= 1);
+            if (allDone) state = "playing";
         }
     } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
