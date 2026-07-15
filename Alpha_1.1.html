@@ -311,13 +311,9 @@ async function updateHighscore(){
         console.log(data);
 
 
-        if(data.best){
-            highscore = data.best;
-        }
-
-        if(data.score && data.score > highscore){
-            highscore = data.score;
-        }
+        if (data.bestTurn) {
+    highscore = data.bestTurn;
+}
 
 
         Turns_Display.innerHTML =
