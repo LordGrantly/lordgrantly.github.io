@@ -1097,10 +1097,69 @@ if (bonus.created >= lifetime) {
             }
         });
         
-        You.style.left = "50%";
-        You.style.top = "50%";
-        You.style.transform = "translate(-50%, -50%)";
-         crosses.forEach(cross => {
+const youRect = You.getBoundingClientRect();
+        enemies.forEach(enemy => {
+            const enemyRect = enemy.element.getBoundingClientRect();
+            if (isColliding(youRect, enemyRect)) {
+                state = "gameover";
+                setTimeout(() => {
+                    location.reload();
+                  
+                }, 5000);
+            }
+        });
+
+        for (let i = crosses.length - 1; i >= 0; i--) {
+            const cross = crosses[i];
+            if (cross.clicked >= lifetime) {
+                const div = document.createElement("div");
+                const cRect = canvas.getBoundingClientRect();
+
+                div.style.left = (cRect.left + cross.x) + "px";
+                div.style.top = (cRect.top + cross.y) + "px";
+                if (cross.type === "normal") {
+                div.className =  "enemy" ;
+                div.style.backgroundColor =  "green"  ;
+                }else if (cross.type === "fast") {
+                div.className =  "fast";
+                div.style.backgroundColor =   "yellow";
+                }else if(cross.type === "slower") {
+                div.className =  "slower" ;
+                div.style.backgroundColor =   "blue";
+                }else{
+                div.className =  "bigger" ;
+                div.style.backgroundColor =   "purple";
+                }
+                document.body.appendChild(div);
+
+                enemies.push({
+                    x: cross.x,
+                    y: cross.y,
+                    targetX: cross.x,
+                    targetY: cross.y,
+                    startX: cross.x,
+                    startY: cross.y,
+                    multi: cross.type === "fast" ? 1.9 : 1,
+                    type: cross.type,
+                    progress: 1,
+                    speed: 0.05,
+                    element: div,
+                });
+                enemies.forEach(enemy => {
+        
+    
+       
+        
+        const enemyRect = enemy.element.getBoundingClientRect();
+        
+        
+    });
+                crosses.splice(i, 1);
+            }
+        }
+
+    
+        crosses.forEach(cross => {
             let size = 40   ;
             if(cross.type === "normal") {
                 ctx.strokeStyle = "green";
@@ -1146,9 +1205,14 @@ if (bonus.created >= lifetime) {
   
    
    
-}
-        if (finish) requestAnimationFrame(draw);
-     else {
+
+    
+    
+  
+   
+   
+
+       
         requestAnimationFrame(draw);
     }
 };
