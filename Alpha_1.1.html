@@ -291,39 +291,38 @@ let money_bonus_chance = 75;
  
 let highscore = 0;
     const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
+let highscoreRequestId = 0;
+
 async function updateHighscore(){
+    if (turn > highscore) {
+        highscore = turn;
+        Turns_Display.textContent = "Turn: " + turn + " | Highscore: " + highscore;
+    }
+
+    const requestId = ++highscoreRequestId;
 
     try{
-
         const response = await fetch(HIGH_SCORE_URL,{
             method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                score:turn
-            })
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({ score: turn })
         });
 
-
         const data = await response.json();
-
         console.log(data);
 
+   
+        if (requestId !== highscoreRequestId) return;
 
-        if (data.bestTurn) {
-    highscore = data.bestTurn;
-}
+        if (data.bestTurn && data.bestTurn > highscore) {
+            highscore = data.bestTurn;
+        }
 
-
-        Turns_Display.innerHTML =
+        Turns_Display.textContent =
             "Turn: " + turn + " | Highscore: " + highscore;
 
-
     }catch(error){
-
         console.log("Highscore error:",error);
-
     }
 }
 
