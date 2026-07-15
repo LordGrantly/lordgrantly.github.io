@@ -125,34 +125,7 @@
     background: #3d7a20;
     border-radius: 8px;
 }
-.shop_scroll_btn {
-    display: none;
-    position: sticky;
-    width: 42px;
-    height: 34px;
-    margin-left: auto;
-    margin-right: 4px;
-    background: #3d7a20;
-    color: white;
-    border: 2px solid #1d1d1d;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: bold;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
-    z-index: 5;
-    opacity: 0.92;
-}
-.shop_scroll_btn.up {
-    top: 0;
-    margin-bottom: 8px;
-}
-.shop_scroll_btn.down {
-    bottom: 0;
-    margin-top: 8px;
-}
+
 
 @media (max-width: 600px) {
     #Shop_Button {
@@ -626,15 +599,6 @@ function updateShop() {
     const list = document.createElement("div");
     list.id = "Shop_Offerings_List";
 
-    const scrollUpBtn = document.createElement("div");
-    scrollUpBtn.className = "shop_scroll_btn up";
-    scrollUpBtn.textContent = "▲";
-    scrollUpBtn.style.display = (user === "phone") ? "flex" : "none";
-    scrollUpBtn.addEventListener("click", () => {
-        list.scrollBy({ top: -150, behavior: "smooth" });
-    });
-    list.appendChild(scrollUpBtn);
-
     offerings.forEach(offering => {
         const div = document.createElement("div");
         
@@ -675,15 +639,6 @@ div.addEventListener("mouseleave", () => {
 
         list.appendChild(div);
     });
-
-    const scrollDownBtn = document.createElement("div");
-    scrollDownBtn.className = "shop_scroll_btn down";
-    scrollDownBtn.textContent = "▼";
-    scrollDownBtn.style.display = (user === "phone") ? "flex" : "none";
-    scrollDownBtn.addEventListener("click", () => {
-        list.scrollBy({ top: 150, behavior: "smooth" });
-    });
-    list.appendChild(scrollDownBtn);
 
     Shop_Offerings.appendChild(list);
 
