@@ -1105,7 +1105,53 @@ if (bonus.created >= lifetime) {
         You.style.left = "50%";
         You.style.top = "50%";
         You.style.transform = "translate(-50%, -50%)";
-        
+         crosses.forEach(cross => {
+            let size = 40   ;
+            if(cross.type === "normal") {
+                ctx.strokeStyle = "green";
+            }else if(cross.type === "fast") {
+                ctx.strokeStyle = "yellow";
+                    size = 20;
+            }else if (cross.type === "slower") {
+                ctx.strokeStyle = "blue";
+                size = 48;
+            }else {
+                ctx.strokeStyle = "purple";
+                size = 70;
+            }
+            
+            ctx.lineWidth = 4;
+
+            ctx.beginPath();
+            ctx.moveTo(cross.x - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x + size - cameraX, cross.y + size - cameraY);
+            ctx.moveTo(cross.x + size - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x - cameraX, cross.y + size - cameraY);
+            ctx.stroke();
+        });
+       
+        if (finish && state === "waiting") {
+            state = "playing";
+        }
+    } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    End_Button.style.display = "none";
+    enemies.forEach(enemy => {
+        enemy.element.style.display = "none";
+        if (enemy.element.area) enemy.element.area.style.display = "none";
+    });
+    Bonuses.forEach(bonus => {
+        bonus.element.style.display = "none";
+    });
+    You.style.display = "none";
+    square.style.display = "none";
+    preview.style.display = "none";
+    
+    
+  
+   
+   
+}
         if (finish) requestAnimationFrame(draw);
     } else {
         requestAnimationFrame(draw);
