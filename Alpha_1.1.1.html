@@ -437,6 +437,10 @@ End_Button.addEventListener('click', () => {
     End_Turn();
 });
 
+End_Button.addEventListener('click', () => {
+    if (state !== "playing" || !endTurnEnabled) return;
+    End_Turn();
+});
 
 
 function updateEndButtonState() {
