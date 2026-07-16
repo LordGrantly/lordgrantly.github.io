@@ -152,7 +152,7 @@
             z-index: 12;
             width:95px;
             height:30px;
-            background-color:rgba(221, 133, 19, 0.95);
+            background-color:rgba(221, 133, 19, 0.1);
             border: 5px solid black;
             position: fixed;
             right: 30px;
@@ -437,10 +437,6 @@ End_Button.addEventListener('click', () => {
     End_Turn();
 });
 
-End_Button.addEventListener('click', () => {
-    if (state !== "playing" || !endTurnEnabled) return;
-    End_Turn();
-});
 
 
 function updateEndButtonState() {
