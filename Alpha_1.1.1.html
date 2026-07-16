@@ -438,7 +438,8 @@ End_Button.addEventListener('click', () => {
 });
 
 
-
+End_Button.style.opacity = '0.1';
+        End_Button.style.pointerEvents = 'none';
 function updateEndButtonState() {
     if (endTurnEnabled) {
         End_Button.style.opacity = '1';
