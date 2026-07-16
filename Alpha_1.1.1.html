@@ -322,6 +322,7 @@ let money_bonus_chance = 5;
 let reset_turns_bonus_chance = 10;
 let discount_bonus_chance = 100;
 let highscore = 0;
+let CanRemoveDiscount = false;
 let discount_Turns_Left = 0;
     const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
 let highscoreRequestId = 0;
@@ -672,8 +673,8 @@ function End_Turn() {
     preview.style.display = "none";
     turn += 1;
     if (discount_Turns_Left !== 0) discount_Turns_Left --;
-    if (discount_Turns_Left === 0) {
-        
+    if (discount_Turns_Left === 0 && CanRemoveDiscount ) {
+        CanRemoveDiscount = false;
         offerings.forEach(offering => {
             offering.cost = Math.floor(offering.cost / 0.8);
             offering.name = offering.name_change();
@@ -766,6 +767,7 @@ enemy.targetY = enemy.y + moveY;
     effect: () => offerings.forEach(offering => {
         discount_Turns_Left ++;
         if (discount_Turns_Left > 1) return;
+        CanRemoveDiscount = true;
         offering.cost = Math.floor(offering.cost * 0.8);
         offering.name = offering.name_change();
         
