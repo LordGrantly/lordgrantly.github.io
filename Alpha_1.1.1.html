@@ -318,8 +318,8 @@ let state = "playing";
 let endTurnEnabled = false;
 let Enemy_scaling = 5;
 let bonus_type = "money";
-let money_bonus_chance = 5;
-let reset_turns_bonus_chance = 10;
+let money_bonus_chance = 65;
+let reset_turns_bonus_chance = 90;
 let discount_bonus_chance = 100;
 let highscore = 0;
 let discount_Turns_Left = 0;
@@ -672,12 +672,12 @@ function End_Turn() {
     preview.style.display = "none";
     turn += 1;
     discount_Turns_Left --;
-    if (discount_Turns_Left === 0) offerings.forEach(offering => {
-        
+    if (discount_Turns_Left === 0 || discount_Turns_Left > 0) {
+        offerings.forEach(offering => {
             offering.cost = Math.floor(offering.cost / 0.8);
             offering.name = offering.name_change();
         
-    });else(
+    });}else(
         offerings.forEach(offering => {
             
             
