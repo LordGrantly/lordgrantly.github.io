@@ -764,14 +764,16 @@ enemy.targetY = enemy.y + moveY;
     Bonuses.push({
      x :Math.random() * (WORLD_WIDTH - 30),
      y : Math.random() * (WORLD_HEIGHT - 30),
-    effect: () => offerings.forEach(offering => {
+    effect: () =>{ 
         discount_Turns_Left ++;
         if (discount_Turns_Left > 1) return;
         CanRemoveDiscount = true;
+        offerings.forEach(offering => {
+        
         offering.cost = Math.floor(offering.cost * 0.8);
         offering.name = offering.name_change();
         
-    }),
+    }),}
     
     element: createBonusElement("gold"),
     color: "gold",
