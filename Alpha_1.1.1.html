@@ -273,7 +273,7 @@
 <div id="You"></div>
 <h3 id="Points">Points: 10</h3>
 <script>
-// GitHub API Configuration - No token needed for public repos
+
 const GITHUB_OWNER = "LordGrantly";
 const GITHUB_REPO = "lordgrantly.github.io";
 const HIGHSCORE_FILE = "highscores.json";
@@ -315,12 +315,14 @@ let frosen = false;
 let playerPoints = 10;
 let PointsInc = 1;
 let state = "playing";
-let endTurnEnabled = true;
+let endTurnEnabled = false;
 let Enemy_scaling = 5;
 let bonus_type = "money";
-let money_bonus_chance = 75;
- 
+let money_bonus_chance = 5;
+let reset_turns_bonus_chance = 10;
+let discount_bonus_chance = 100;
 let highscore = 0;
+let discount_Turns_Left = 0;
     const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
 let highscoreRequestId = 0;
 
@@ -485,7 +487,7 @@ function device_check() {
         
         user = "phone";
         Enemy_scaling = 2;
-        Enemy_step = 100;
+        Enemy_step = 70;
         offerings[5].effect = () => { Enemy_step -= 30; };
         offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
         offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
@@ -669,7 +671,22 @@ function End_Turn() {
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
     preview.style.display = "none";
     turn += 1;
-    
+    discount_Turns_Left --;
+    if (discount_Turns_Left === 0) offerings.forEach(offering => {
+        
+            offering.cost = Math.floor(offering.cost / 0.8);
+            offering.name = offering.name_change();
+        
+    });else(
+        offerings.forEach(offering => {
+            
+            
+                offering.name = offering.name_change();
+            
+        
+    })
+    )
+
     updateHighscore();
     playerPoints += PointsInc;
     enemy_points = Math.floor(enemy_Max_points);
@@ -745,10 +762,28 @@ enemy.targetY = enemy.y + moveY;
     if (form === "bonus" && !bonus_spawned) {
     bonus_spawned = true;
     if (  Math.random() * 100 < money_bonus_chance) bonus_type = "money";
-    else bonus_type = "reset_turns";
+    else if (Math.random() * 100 < reset_turns_bonus_chance) bonus_type = "reset_turns";
+    else if (Math.random() * 100 < discount_bonus_chance) bonus_type = "discount";
         
+    if (bonus_type === "discount") {
+        
+    Bonuses.push({
+     x :Math.random() * (WORLD_WIDTH - 30),
+     y : Math.random() * (WORLD_HEIGHT - 30),
+    effect: () => offerings.forEach(offering => {
+        discount_Turns_Left ++;
+        if (discount_Turns_Left > 1) return;
+        offering.cost = Math.floor(offering.cost * 0.8);
+        offering.name = offering.name_change();
+        
+    }),
     
-    if (bonus_type === "money") {
+    element: createBonusElement("gold"),
+    color: "gold",
+    type: "discount"
+    
+});  
+}else  if (bonus_type === "money") {
     Bonuses.push({
      x :Math.random() * (WORLD_WIDTH - 30),
      y : Math.random() * (WORLD_HEIGHT - 30),
