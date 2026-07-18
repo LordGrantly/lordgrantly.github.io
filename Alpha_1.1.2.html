@@ -1,1 +1,1305 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha 1.1.1</title>
+    <style>
+      body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+      canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+    z-index: 0;
+    border: 1px solid rgb(99, 11, 11);    
+}
+
+        #pe {
+            position: absolute;
+            left: 43.5%;
+            
+    font-weight: bold;
+}
+#Points {
+    position: absolute;
+    left: 47.1%;
+    top: 30px;
+    font-weight: bold;
+    font-size: 18px;
+}
+#Bonus {
+    display: none;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+
+    
+    
+    color: gold;
+}
+#Shop_Button {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    z-index: 10;
+
+    width: 180px;
+    height: 55px;
+
+    background:  #3d7a20;
+    color: white;
+
+    border: 3px solid #1d1d1d;
+    border-radius: 14px;
+
+    font-size: 20px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    
+}
+
+#Shop_Button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+#Shop_Button:active {
+    transform: translateY(4px);
+    
+}
+
+#Shop_Button::before {
+    content: "Shop";
+}
+#Shop_Offerings {
+    display: none;
+    z-index: 10;
+    position: fixed;
+    right: 30px;
+    bottom: 100px;
+    width: min(90vw, 400px);
+    max-height: 80vh;
+    background: rgba(30, 30, 30, 0.95);
+    border: 3px solid #555;
+    border-radius: 16px;
+    padding: 12px;
+    backdrop-filter: blur(6px);
+    font-family: Arial, sans-serif;
+    color: white;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+#Shop_Offerings_Header {
+    flex-shrink: 0;
+}
+#Shop_Offerings_List {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #3d7a20 rgba(255,255,255,0.08);
+}
+#Shop_Offerings_List::-webkit-scrollbar {
+    width: 8px;
+}
+#Shop_Offerings_List::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+}
+#Shop_Offerings_List::-webkit-scrollbar-thumb {
+    background: #3d7a20;
+    border-radius: 8px;
+}
+
+
+@media (max-width: 600px) {
+    #Shop_Button {
+        width: min(90vw, 180px);
+    }
+    #Shop_Offerings {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 90vw;
+        bottom: 90px;
+        max-height: 70vh;
+    }
+    #Shop_Offerings h2 {
+        font-size: 1rem;
+    }
+    #Shop_Offerings div,
+    #Shop_Offerings button {
+        font-size: 1rem;
+    }
+}
+    #End_Button{
+            display: block;
+            z-index: 12;
+            width:95px;
+            height:30px;
+            background-color:rgba(221, 133, 19, 1);
+            border: 5px solid black;
+            position: fixed;
+            right: 30px;
+            bottom: 100px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:bold;
+            border-radius: 6px;
+            font-size:20px;
+        }
+        
+    #mycanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+    
+    #You, #preview, #square, #Points, #pe {
+            z-index: 11;
+            position: absolute;
+        }
+        
+  #square{
+    width: 200px;
+    height: 200px;
+    background-color: rgba(0,0,100,0.6);
+    border: 5px solid black;
+    position: absolute;
+    left: 50px;
+    top: 50px;
+    display : none;
+  }
+  .fast {
+    width: 20px;
+    height: 20px;
+    background-color: yellow;
+    border: 5px solid black;
+    position: absolute;
+    touch-action: none;
+    pointer-events: none;
+    z-index:9;
+  }
+  .enemy {
+    width: 40px;
+    height: 40px;
+    background-color: red;
+    border: 5px solid black;
+    position: absolute;
+    touch-action: none;
+    pointer-events: none;
+    z-index:8;
+  }
+  .slower {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    border: 5px solid black;
+    position: absolute;
+    pointer-events: none;
+    touch-action: none;
+    z-index:6;
+  }
+  .slower_area {
+    width: 300px;
+    height: 300px;
+    background-color: rgba(0,0,255,0.3);
+    border: 5px solid black;
+    position: absolute;
+    pointer-events: none;
+    z-index:1;
+  }
+  .bigger {
+    width: 80px;
+    height: 80px;
+    background-color: purple;
+    border: 5px solid black;
+    position: absolute;
+    touch-action: none;
+    pointer-events: none;
+    z-index:3;
+      
+
+  }
+  #You{
+    left: 50%;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    background-color: rgb(26, 165, 112);
+    border: 5px solid black;
+    position: absolute;
+  }
+#preview{
+    display:none;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(26, 165, 112,0.3);
+    border: 5px solid black;
+    position: absolute;
+    left: 50px;
+    top: 50px;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="Shop_Button"></div>
+<div id="Shop_Offerings"></div> 
+<div id="preview"></div>
+<h2 id="pe"><b>Turn: 0 | Highscore: 0</b></h2>
+<div id="square"></div>
+<div id="End_Button">End Turn</div>
+<canvas id="mycanvas"></canvas>
+<div id="You"></div>
+<h3 id="Points">Points: 10</h3>
+<script>
+
+const GITHUB_OWNER = "LordGrantly";
+const GITHUB_REPO = "lordgrantly.github.io";
+const HIGHSCORE_FILE = "highscores.json";
+const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${HIGHSCORE_FILE}`;
+
+let turn = 0;
+const Points_Display = document.getElementById("Points");
+const Shop_Button = document.getElementById("Shop_Button");
+const preview = document.getElementById("preview"); 
+const Turns_Display = document.getElementById("pe");
+const You = document.getElementById("You");
+const End_Button = document.getElementById("End_Button");
+const square = document.getElementById("square");
+
+let dpr = 1;
+let cameraX = 0;
+let cameraY = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let VIEWPORT_WIDTH = 0;
+let VIEWPORT_HEIGHT = 0;
+let bonus_spawned = false;
+let bonus_chance = 10;
+let Enemy_step = 160;
+let Max_turns = 2;
+let Turns = 2;
+let canvas, ctx;
+let enemy_Type = "normal";
+let enemy_cost = 1;
+let enemy_Max_points = 200;
+let enemy_points = 200;
+let mode = "moving";
+let fast_chance = 20;
+let slow_chance = 40; //20 + 20
+let bigger_chance = 50; //20 + 20 + 10
+let range = 200;
+let true_range = range ;
+let frosen = false;
+let playerPoints = 10;
+let PointsInc = 1;
+let state = "playing";
+let endTurnEnabled = false;
+let Enemy_scaling = 5;
+let bonus_type = "money";
+let money_bonus_chance = 65;
+let reset_turns_bonus_chance = 90;
+let discount_bonus_chance = 100;
+let highscore = 0;
+let CanRemoveDiscount = false;
+let discount_Turns_Left = 0;
+    const HIGH_SCORE_URL = "https://alpha-highscore.wincenty-myjak.workers.dev";
+let highscoreRequestId = 0;
+
+async function updateHighscore(){
+    if (turn > highscore) {
+        highscore = turn;
+        Turns_Display.textContent = "Turn: " + turn + " | Highscore: " + highscore;
+    }
+
+    const requestId = ++highscoreRequestId;
+
+    try{
+        const response = await fetch(HIGH_SCORE_URL,{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({ score: turn })
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+   
+        if (requestId !== highscoreRequestId) return;
+
+        if (data.bestTurn && data.bestTurn > highscore) {
+            highscore = data.bestTurn;
+        }
+
+        Turns_Display.textContent =
+            "Turn: " + turn + " | Highscore: " + highscore;
+
+    }catch(error){
+        console.log("Highscore error:",error);
+    }
+}
+
+
+async function getHighscore(){
+
+    try{
+
+        const response = await fetch(HIGH_SCORE_URL);
+
+        const data = await response.json();
+
+        highscore = data.bestTurn;
+
+
+        Turns_Display.textContent =
+            "Turn: " + turn + " | Highscore: " + highscore;
+
+
+    }catch(error){
+
+        console.log("Could not load highscore",error);
+
+    }
+}
+async function submitHighscore(score){
+
+    try {
+
+        const response = await fetch(HIGH_SCORE_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                score:score
+            })
+        });
+
+
+        const data = await response.json();
+
+        console.log("Highscore response:", data);
+
+    } catch(error){
+
+        console.log("Highscore error:", error);
+
+    }
+
+}
+
+
+
+
+    const turnsDisplay = document.createElement("h2");
+    turnsDisplay.style.position = "absolute";
+    turnsDisplay.style.left = "10px";
+    turnsDisplay.style.top = "0px";
+    document.body.appendChild(turnsDisplay);
+const offerings = [
+    { name: `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`,cost: 10,multi: 2,effect: () => { bonus_chance += 10; },name_change: () => `Bonus Chance (${bonus_chance}% ---> ${bonus_chance + 10}%)`},
+    { name: `More income (${PointsInc} ---> ${PointsInc + 1})`,cost: 20,multi: 1.5,effect: () => { PointsInc += 1; },name_change: () => `More income (${PointsInc} ---> ${PointsInc + 1})`},
+    { name: `Max Turns (${Max_turns } ---> ${Max_turns+1})`, cost: 40, multi: 3, effect: () => { Max_turns += 1; Turns += 1; }, name_change: () => `Max Turns (${Max_turns } ---> ${Max_turns+1})` },
+    { name: `Stronger Player (${true_range} ---> ${true_range + 35})`, cost: 10, multi: 1.5, effect: () => { true_range += 35; range += 35; }, name_change: () => `Stronger Player (${true_range} ---> ${true_range + 35})`},
+    { name: `Extra Turn`, cost: 10, multi: 1.1, effect: () => { Turns += 1; } ,name_change: () => `Extra Turn`},
+    { name: `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`, cost: 10, multi: 2, effect: () => { Enemy_step -= 50; }, name_change: ()  => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 50})`},
+    { name: `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`, cost: 20, multi: 2, effect: () => { enemy_Max_points -= 1; } , name_change: () => `Less Enemies (${Math.floor(enemy_Max_points)} ---> ${Math.floor(enemy_Max_points - 1)})`},
+];
+const slower_areas = [];
+const Bonuses =[];
+const crosses = [];
+
+const enemies = [];
+const lifetime = 5;
+End_Button.addEventListener('click', () => {
+    if (state !== "playing" || !endTurnEnabled) return;
+    End_Turn();
+});
+
+
+End_Button.style.opacity = '0.1';
+        End_Button.style.pointerEvents = 'none';
+function updateEndButtonState() {
+    if (endTurnEnabled) {
+        End_Button.style.opacity = '1';
+        End_Button.style.pointerEvents = 'auto';
+    } else {
+        End_Button.style.opacity = '0.1';
+        End_Button.style.pointerEvents = 'none';
+    }
+}
+
+function clampPlayerPosition(x, y) {
+    const playerWidth = You.offsetWidth;
+    const playerHeight = You.offsetHeight;
+    const minX = 0;
+    const minY = 0;
+    const maxX = WORLD_WIDTH - playerWidth;
+    const maxY = WORLD_HEIGHT - playerHeight;
+    return {
+        x: Math.min(Math.max(x, minX), maxX),
+        y: Math.min(Math.max(y, minY), maxY)
+    };
+}
+
+function clampPreviewPosition(x, y) {
+    const previewWidth = preview.offsetWidth;
+    const previewHeight = preview.offsetHeight;
+    const minX = 0;
+    const minY = 0;
+    const maxX = Math.max(0, VIEWPORT_WIDTH - previewWidth);
+    const maxY = Math.max(0, VIEWPORT_HEIGHT - previewHeight);
+    return {
+        x: Math.min(Math.max(x, minX), maxX),
+        y: Math.min(Math.max(y, minY), maxY)
+    };
+}
+
+function isColliding(a, b) {
+    return !(
+        a.right < b.left ||
+        a.left > b.right ||
+        a.bottom < b.top ||
+        a.top > b.bottom 
+    );
+}
+function device_check() {
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        
+        user = "phone";
+        Enemy_scaling = 2;
+        Enemy_step = 70;
+        offerings[5].effect = () => { Enemy_step -= 30; };
+        offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        offerings[5].name = `Weaker Enemies (${Enemy_step} ---> ${Enemy_step - 30})`;
+        Shop_Button.style.width = "100px";
+        Shop_Button.style.height = "40px";
+        End_Button.style.bottom = "74px";
+        Turns_Display.style.left = "20%";
+    }else{
+        
+        user = "pc";
+        
+    }
+}
+function setCanvas() {
+    canvas = document.getElementById("mycanvas");
+    
+    ctx = canvas.getContext("2d");
+    VIEWPORT_WIDTH = window.innerWidth;
+    VIEWPORT_HEIGHT = window.innerHeight;
+    
+   
+        WORLD_WIDTH = window.innerWidth;
+        WORLD_HEIGHT = window.innerHeight;
+    
+}
+function resizeCanvas() {
+    VIEWPORT_WIDTH = window.innerWidth;
+    VIEWPORT_HEIGHT = window.innerHeight;
+    
+    
+        WORLD_WIDTH = window.innerWidth;
+        WORLD_HEIGHT = window.innerHeight;
+    
+
+   
+    const canvasWidth = user === "phone" ? VIEWPORT_WIDTH : WORLD_WIDTH;
+    const canvasHeight = user === "phone" ? VIEWPORT_HEIGHT : WORLD_HEIGHT;
+
+    canvas.style.width = canvasWidth + "px";
+    canvas.style.height = canvasHeight + "px";
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+Shop_Button.addEventListener("click", function () {
+    if (state !== "playing") return; 
+
+    if (mode === "moving") {
+        Points_Display.textContent = "Points: " + playerPoints  ;
+        mode = "shop"; 
+        Shop_Offerings.style.display = "flex";
+        updateShop(); 
+    } else if (mode === "shop") {
+        Points_Display.textContent = "Points: " + playerPoints  ;
+        square.style.width = range + "px";
+        square.style.height = range + "px";  
+        mode = "moving"; 
+        Shop_Offerings.style.display = "none";
+    }
+});
+
+function updateShop() {
+ 
+    Shop_Offerings.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.id = "Shop_Offerings_Header";
+
+    const title = document.createElement("h2");
+    
+    title.textContent = "Points: " + playerPoints  ;
+
+   
+    const toggleContainer = document.createElement('div');
+    toggleContainer.style.display = 'flex';
+    toggleContainer.style.flexDirection = 'column';
+    toggleContainer.style.gap = '8px';
+    toggleContainer.style.marginBottom = '12px';
+
+    const toggleLabel = document.createElement('div');
+    toggleLabel.textContent = 'Main End Turn Button:';
+    toggleLabel.style.color = 'white';
+    toggleLabel.style.fontSize = '16px';
+    toggleLabel.style.fontWeight = 'bold';
+
+    const toggleButton = document.createElement('button');
+    toggleButton.textContent = endTurnEnabled ? 'Disable End Turn' : 'Enable End Turn';
+    toggleButton.style.padding = '10px';
+    toggleButton.style.background = '#3d7a20';
+    toggleButton.style.color = 'white';
+    toggleButton.style.border = '2px solid #111';
+    toggleButton.style.borderRadius = '12px';
+    toggleButton.style.cursor = 'pointer';
+    toggleButton.style.fontSize = '14px';
+    toggleButton.style.fontWeight = 'bold';
+
+    toggleButton.addEventListener('click', () => {
+        endTurnEnabled = !endTurnEnabled;
+        toggleButton.textContent = endTurnEnabled ? 'Disable End Turn' : 'Enable End Turn';
+        updateEndButtonState();
+    });
+
+    toggleContainer.appendChild(toggleLabel);
+    toggleContainer.appendChild(toggleButton);
+    header.appendChild(toggleContainer);
+    header.appendChild(title);
+    Shop_Offerings.appendChild(header);
+
+    const list = document.createElement("div");
+    list.id = "Shop_Offerings_List";
+
+    offerings.forEach(offering => {
+        const div = document.createElement("div");
+        
+        div.innerHTML = `${offering.name_change ? offering.name_change() : offering.name} 
+            (<b><font color=green>${offering.cost}</font></b> points)`;
+        div.style.cursor = "pointer";
+        div.style.padding = "10px";
+        div.style.marginBottom = "10px";
+        div.style.borderRadius = "20px";
+        div.style.background = "rgba(255,255,255,0.08)";
+        div.style.border = "1px solid rgba(255,255,255,0.1)";
+        div.style.transition = "0.15s";
+        div.style.fontWeight = "bold";
+        
+        div.addEventListener("mouseenter", () => {
+    div.style.background = "rgba(255,255,255,0.18)";
+});
+
+div.addEventListener("mouseleave", () => {
+    div.style.background = "rgba(255,255,255,0.08)";
+});
+
+        div.addEventListener("click", () => {
+            
+            if (playerPoints >= offering.cost) {
+                offering.effect(); 
+                offering.name = offering.name_change();
+                playerPoints -= offering.cost;
+                Points_Display.textContent = "Points: " + playerPoints  ;
+                offering.cost = Math.floor(offering.cost * offering.multi);
+                div.textContent = `${offering.name} (${offering.cost} points)`;
+                title.textContent = "Points: " + playerPoints  ;
+                updateShop();
+            }
+        });
+
+        list.appendChild(div);
+    });
+
+    Shop_Offerings.appendChild(list);
+
+}
+
+function createBonusElement(color) {
+
+const div = document.createElement("div");
+
+div.style.position = "absolute";
+div.style.width = "30px";
+div.style.height = "30px";
+div.style.backgroundColor = color;
+div.style.border = "5px solid black";
+
+
+div.style.color = "pink";
+
+
+
+document.body.appendChild(div);
+
+return div;
+
+}
+function End_Turn() {
+    if (state !== "playing") return;
+    frosen = false;
+    state = "waiting";
+    square.style.backgroundColor = "rgba(0,0,100,0.6)";
+    preview.style.display = "none";
+    turn += 1;
+    if (discount_Turns_Left !== 0) discount_Turns_Left --;
+    if (discount_Turns_Left === 0 && CanRemoveDiscount ) {
+        CanRemoveDiscount = false;
+        offerings.forEach(offering => {
+            offering.cost = Math.floor(offering.cost / 0.8);
+            offering.name = offering.name_change();
+        
+    });}
+
+    updateHighscore();
+    playerPoints += PointsInc;
+    enemy_points = Math.floor(enemy_Max_points);
+    enemy_Max_points += 0.1;
+    bonus_spawned = false;
+    Points_Display.textContent = "Points: " + playerPoints;
+    Turns_Display.textContent ="Turn: " + turn + " | Highscore: " + highscore;
+    crosses.forEach(cross => {
+        
+        cross.clicked += 1;
+        
+        
+    });
+    Bonuses.forEach(bonus => {
+        bonus.created += 1;
+    });
+    square.style.backgroundColor = "rgba(0,0,100,0.6)";
+    Turns = Max_turns;
+    
+    enemies.forEach(enemy => {
+    enemy.startX = enemy.x;
+    enemy.startY = enemy.y;
+
+    let dy = You.offsetTop - enemy.y;
+    let dx = You.offsetLeft - enemy.x;
+
+
+    let moveX = 0;
+    let moveY = 0;
+    let stepBase = Enemy_step;
+
+let step = enemy.type === "fast"    ? stepBase * 1.5: stepBase;
+
+if (Math.abs(dx) > Math.abs(dy)) {
+    let move = Math.min(Math.abs(dx), step);
+    moveX = dx > 0 ? move : -move;
+} else {
+    let move = Math.min(Math.abs(dy), step);
+    moveY = dy > 0 ? move : -move;
+}
+
+enemy.targetX = enemy.x + moveX;
+enemy.targetY = enemy.y + moveY;
+
+    enemy.progress = 0;
+});
+
+        
+    
+    
+    const youRect = You.getBoundingClientRect();
+    enemies.forEach(enemy => {
+        
+    
+       
+        
+        const enemyRect = enemy.element.getBoundingClientRect();
+        if (isColliding(youRect, enemyRect)) {
+            state = "gameover";
+            
+            submitHighscore(turn);
+            setTimeout(() => {
+                location.reload();
+            
+        }, 5000);
+            
+        }
+        
+    });
+   
+    
+    let form = Math.random()*100 < bonus_chance ? "bonus" : "enemy";
+    if (form === "bonus" && !bonus_spawned) {
+    bonus_spawned = true;
+    if (  Math.random() * 100 < money_bonus_chance) bonus_type = "money";
+    else if (Math.random() * 100 < reset_turns_bonus_chance) bonus_type = "reset_turns";
+    else if (Math.random() * 100 < discount_bonus_chance) bonus_type = "discount";
+        
+    if (bonus_type === "discount") {
+        
+    Bonuses.push({
+     x :Math.random() * (WORLD_WIDTH - 30),
+     y : Math.random() * (WORLD_HEIGHT - 30),
+    effect: () =>{ 
+        discount_Turns_Left ++;
+        if (discount_Turns_Left > 1) return;
+        CanRemoveDiscount = true;
+        offerings.forEach(offering => {
+        
+        offering.cost = Math.floor(offering.cost * 0.8);
+        offering.name = offering.name_change();
+        
+    })},
+    
+    element: createBonusElement("gold"),
+    color: "gold",
+    type: "discount"
+    
+});  
+}else  if (bonus_type === "money") {
+    Bonuses.push({
+     x :Math.random() * (WORLD_WIDTH - 30),
+     y : Math.random() * (WORLD_HEIGHT - 30),
+    effect: () => { playerPoints += PointsInc * 2 + Math.floor(Math.random() * 3) + 1; },
+    amount: PointsInc * 2 + Math.floor(Math.random() * 3) + 1,
+    element: createBonusElement("pink"),
+    color: "pink",
+    type: "money"
+    
+}); 
+}
+else if (bonus_type === "reset_turns" ) {
+        
+        Bonuses.push({
+            x: Math.random() * (WORLD_WIDTH - 30),
+            y: Math.random() * (WORLD_HEIGHT - 30),
+            created: 0,
+            effect: () => { Turns = Max_turns; },
+            element: createBonusElement("blue"),
+            color: "blue",
+            type: "reset_turns"
+        });
+    }
+        
+    }
+    
+    
+   
+Bonuses.forEach(bonus => {
+        
+        const bonusRect = bonus.element.getBoundingClientRect(); 
+if (isColliding(youRect, bonusRect)) {
+            bonus.element.remove();
+            bonus.effect();
+            
+            const div = document.createElement("div");
+            document.body.appendChild(div);
+            div.style.position = "absolute";
+            div.style.left = bonusRect.left + "px";
+            div.style.top = (bonusRect.top- 40) + "px";
+            
+            div.style.fontSize = "40px";
+            div.style.fontWeight = "bold";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
+            setTimeout(() => {
+                div.remove();
+            }, 1000);
+            Points_Display.textContent = "Points: " + playerPoints;
+        
+            
+            
+            Bonuses.splice(Bonuses.indexOf(bonus), 1);
+        }});
+
+
+
+            Points_Display.textContent = "Points: " + playerPoints;
+            let safe = 100000;
+    while (enemy_points > 0 && safe-- > 0 ) {
+    let form = "enemy"; 
+
+
+let Enemy_Type = "normal";
+let cost = 1;
+
+
+    let Randomize_Enemy_Type = Math.random() * 100;
+    Enemy_Type = Randomize_Enemy_Type < fast_chance  && Enemy_Type === "normal"? "fast" : Enemy_Type;
+    Enemy_Type = Randomize_Enemy_Type < slow_chance && Enemy_Type === "normal"? "slower" : Enemy_Type;
+    Enemy_Type = Randomize_Enemy_Type < bigger_chance && Enemy_Type === "normal"  ? "bigger" : Enemy_Type;
+
+    if (Enemy_Type === "slower" || Enemy_Type === "bigger") {
+        cost = 3;
+        
+    } else{
+    cost = (Enemy_Type === "fast") ? 2 : 1;
+    }
+    if (enemy_points < cost) {
+        Enemy_Type = "normal";
+        cost = 1;
+    }
+
+    enemy_points -= cost;
+    addCross(Enemy_Type, form);
+    }
+    Enemy_step += Enemy_scaling;
+    offerings.forEach(offering => {
+
+        offering.name = offering.name_change();
+        
+    });
+    updateShop();
+    
+
+            
+           
+        };
+        
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && state === "playing" && mode === "shop" ) mode = "moving";
+        if (event.key === "Enter" && state === "playing" && mode === "moving" ) End_Turn();
+
+       
+    });
+    square.addEventListener("click", (event) => {
+    if (Turns <= 0) return;
+    if (state !== "playing") return;
+    preview.style.backgroundColor = "rgba(26, 165, 112,0.3)";
+    preview.style.display = "block";
+
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
+
+    const screenX = event.clientX - pW / 2;
+    const screenY = event.clientY - pH / 2;
+    const clampedPreview = clampPreviewPosition(screenX, screenY);
+
+    preview.style.left = clampedPreview.x + "px";
+    preview.style.top  = clampedPreview.y + "px";
+    const rect = preview.getBoundingClientRect();
+    enemies.forEach(enemy => {
+        const enemyRect = enemy.element.getBoundingClientRect();
+        if (isColliding(rect, enemyRect)) {
+            preview.style.backgroundColor= "rgba(200,0,0,0.5)";
+
+            
+            
+            
+        }
+
+    });
+    square.style.display = "none";
+    preview.style.pointerEvents = "auto";
+    
+    
+    
+});
+
+function addCross(type,form) {
+    
+ const x = Math.random() * (WORLD_WIDTH - 32);
+const y = Math.random() * (WORLD_HEIGHT - 32);
+    
+    crosses.push({
+        x,
+        y,
+        created: 0,
+        clicked: 0,
+        form: form ==="bonus"? "bonus" : "enemy",
+        type: type 
+    });
+}
+
+You.addEventListener("click", () => {
+    if (state !== "playing") return;
+
+    const squareVisible = window.getComputedStyle(square).display !== "none";
+
+    if (!squareVisible) {
+        square.style.display = "block";
+        preview.style.pointerEvents = "none";
+    } else {
+        square.style.display = "none";
+        preview.style.pointerEvents = "auto";
+    }
+
+    const pX = You.offsetLeft;
+    const pY = You.offsetTop;
+
+    const sqW = square.offsetWidth;
+    const sqH = square.offsetHeight;
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
+
+    square.style.left = (pX - (sqW - pW) / 2) + "px";
+    square.style.top  = (pY - (sqH - pH) / 2) + "px";
+    
+    
+});
+preview.addEventListener("click", (event) => {
+    if (state !== "playing") return;
+    square.style.backgroundColor = "rgba(0,0,100,0.6)";
+    state = "waiting";
+    frosen = false;
+    
+
+    
+    const worldX = preview.offsetLeft + cameraX;
+    const worldY = preview.offsetTop + cameraY;
+    const clamped = clampPlayerPosition(worldX, worldY);
+    You.style.left = (clamped.x - cameraX) + "px";
+    You.style.top  = (clamped.y - cameraY) + "px";
+    
+   
+    
+    
+    const YouRect = You.getBoundingClientRect();    
+    enemies.forEach(enemy => {
+            if (enemy.element.area) {
+                const areaRect = enemy.element.area.getBoundingClientRect();
+                if (isColliding(YouRect, areaRect)) {
+                    frosen = true;
+                }
+            }
+    });
+    if (frosen) {
+        range = true_range * 0.5 + 50;
+    }else {
+        range = true_range;
+    }
+    square.style.width = range + "px";
+    square.style.height = range + "px"; 
+    
+   
+    const pW = You.offsetWidth;
+    const pH = You.offsetHeight;
+    const sqW = square.offsetWidth;
+    const sqH = square.offsetHeight;
+    square.style.left = (clamped.x - sqW/2 + pW/2 - cameraX) + "px";
+    square.style.top = (clamped.y - sqH/2 + pH/2 - cameraY) + "px";
+    
+
+    if (user === "phone") {
+        const centerX = clamped.x - VIEWPORT_WIDTH / 2;
+        const centerY = clamped.y - VIEWPORT_HEIGHT / 2;
+        cameraX = Math.max(0, Math.min(centerX, WORLD_WIDTH - VIEWPORT_WIDTH));
+        cameraY = Math.max(0, Math.min(centerY, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+    }
+    
+    preview.style.display = "none";
+    preview.style.pointerEvents = "none";
+    
+     const youRect = You.getBoundingClientRect();
+    enemies.forEach(enemy => {
+        const enemyRect = enemy.element.getBoundingClientRect();
+        if (isColliding(youRect, enemyRect)) {
+            
+            location.reload();
+      
+        }});
+
+    Turns -= 1;
+
+    Bonuses.forEach(bonus => {
+        
+        const bonusRect = bonus.element.getBoundingClientRect();
+       if (isColliding(youRect, bonusRect)) {
+            bonus.element.remove();
+            bonus.effect();
+            
+            const div = document.createElement("div");
+            document.body.appendChild(div);
+            div.style.position = "absolute";
+            div.style.left = bonusRect.left + "px";
+            div.style.top = (bonusRect.top- 40) + "px";
+            
+            div.style.fontSize = "40px";
+            div.style.fontWeight = "bold";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
+            setTimeout(() => {
+                div.remove();
+            }, 1000);
+            Points_Display.textContent = "Points: " + playerPoints;
+        
+            
+            
+            Bonuses.splice(Bonuses.indexOf(bonus), 1);
+        }});
+
+        square.style.display = "none";
+        
+    if (Turns <= 0) {
+        
+        square.style.backgroundColor = "rgba(200,0,0,0.8)";
+        square.addEventListener("click", () => {
+            
+           square.style.display = "none";
+          
+        });
+    }
+    state = "playing";
+});
+function draw() {
+    const square = document.getElementById("square");
+    
+     turnsDisplay.textContent = Turns + "/" + Max_turns;
+    
+    if (Turns !== 0) square.style.backgroundColor = "rgba(0,0,100,0.6)";
+    if (mode === "moving") {
+        End_Button.style.display = "block";
+        Points_Display.style.display = "block";
+        enemies.forEach(enemy => {
+            enemy.element.style.display = "block";
+            if (enemy.element.area) enemy.element.area.style.display = "block";
+        });
+        Bonuses.forEach(bonus => {
+            bonus.element.style.display = "block";
+        });
+            Shop_Offerings.style.display = "none"; 
+            You.style.display = "block";
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let finish = true;
+        
+        for (let i = Bonuses.length - 1; i >= 0; i--) {
+
+const bonus = Bonuses[i];
+
+if (bonus.created >= lifetime) {
+
+    bonus.element.remove();
+
+    Bonuses.splice(i, 1);
+
+    continue;
+
+} else {
+
+    
+
+    bonus.element.style.left = (bonus.x - cameraX) + "px";
+    bonus.element.style.top = (bonus.y - cameraY) + "px";
+    Bonuses.forEach(bonus => {
+        
+        const bonusRect = bonus.element.getBoundingClientRect();
+        const youRect = You.getBoundingClientRect();
+        if (isColliding(youRect, bonusRect)) {
+            bonus.element.remove();
+            bonus.effect();
+            
+            const div = document.createElement("div");
+            document.body.appendChild(div);
+            div.style.position = "absolute";
+            div.style.left = bonusRect.left + "px";
+            div.style.top = (bonusRect.top- 40) + "px";
+            
+            div.style.fontSize = "40px";
+            div.style.fontWeight = "bold";
+            div.style.color = bonus.color;
+            if (bonus.type === "money") div.textContent = "+" + bonus.amount;
+            else if (bonus.type === "reset_turns") div.textContent = "Turns Reset!";
+            setTimeout(() => {
+                div.remove();
+            }, 1000);
+            Points_Display.textContent = "Points: " + playerPoints;
+        
+            
+            
+            Bonuses.splice(Bonuses.indexOf(bonus), 1);
+        }});
+
+    
+}
+}
+        enemies.forEach(enemy => {
+            if (enemy.progress < 1) {
+                enemy.progress += 0.05;
+                
+                const currentX = enemy.startX + (enemy.targetX - enemy.startX) * enemy.progress;
+                const currentY = enemy.startY + (enemy.targetY - enemy.startY) * enemy.progress;
+                
+                enemy.x = currentX;
+                enemy.y = currentY;
+            }
+            enemy.element.style.left = (enemy.x - cameraX) + "px";
+            enemy.element.style.top = (enemy.y - cameraY) + "px";
+            
+            
+            if (enemy.type === "slower") {
+                const areaSize = 300;
+                const centerX = enemy.x + enemy.element.offsetWidth / 2;
+                const centerY = enemy.y + enemy.element.offsetHeight / 2;
+                if (!enemy.element.area) {
+                    const area = document.createElement("div");
+                    area.className = "slower_area";
+                    document.body.appendChild(area);
+                    enemy.element.area = area;
+                }
+                enemy.element.area.style.left = (centerX - areaSize / 2 - cameraX) + "px";
+                enemy.element.area.style.top = (centerY - areaSize / 2 - cameraY) + "px";
+            }
+        });
+        
+const youRect = You.getBoundingClientRect();
+        enemies.forEach(enemy => {
+            const enemyRect = enemy.element.getBoundingClientRect();
+            if (isColliding(youRect, enemyRect)) {
+                state = "gameover";
+                setTimeout(() => {
+                    location.reload();
+                  
+                }, 5000);
+            }
+        });
+
+        for (let i = crosses.length - 1; i >= 0; i--) {
+            const cross = crosses[i];
+            if (cross.clicked >= lifetime) {
+                const div = document.createElement("div");
+                const cRect = canvas.getBoundingClientRect();
+
+                div.style.left = (cRect.left + cross.x) + "px";
+                div.style.top = (cRect.top + cross.y) + "px";
+                if (cross.type === "normal") {
+                div.className =  "enemy" ;
+                div.style.backgroundColor =  "green"  ;
+                }else if (cross.type === "fast") {
+                div.className =  "fast";
+                div.style.backgroundColor =   "yellow";
+                }else if(cross.type === "slower") {
+                div.className =  "slower" ;
+                div.style.backgroundColor =   "blue";
+                }else{
+                div.className =  "bigger" ;
+                div.style.backgroundColor =   "purple";
+                }
+                document.body.appendChild(div);
+
+                enemies.push({
+                    x: cross.x,
+                    y: cross.y,
+                    targetX: cross.x,
+                    targetY: cross.y,
+                    startX: cross.x,
+                    startY: cross.y,
+                    multi: cross.type === "fast" ? 1.9 : 1,
+                    type: cross.type,
+                    progress: 1,
+                    speed: 0.05,
+                    element: div,
+                });
+                enemies.forEach(enemy => {
+        
+    
+       
+        
+        const enemyRect = enemy.element.getBoundingClientRect();
+        
+        
+    });
+                crosses.splice(i, 1);
+            }
+        }
+
+    
+        crosses.forEach(cross => {
+            let size = 40   ;
+            if(cross.type === "normal") {
+                ctx.strokeStyle = "green";
+            }else if(cross.type === "fast") {
+                ctx.strokeStyle = "yellow";
+                    size = 20;
+            }else if (cross.type === "slower") {
+                ctx.strokeStyle = "blue";
+                size = 48;
+            }else {
+                ctx.strokeStyle = "purple";
+                size = 70;
+            }
+            
+            ctx.lineWidth = 4;
+
+            ctx.beginPath();
+            ctx.moveTo(cross.x - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x + size - cameraX, cross.y + size - cameraY);
+            ctx.moveTo(cross.x + size - cameraX, cross.y - cameraY);
+            ctx.lineTo(cross.x - cameraX, cross.y + size - cameraY);
+            ctx.stroke();
+        });
+       
+        if ( state === "waiting") {
+            const allDone = enemies.every(e => e.progress >= 1);
+            if (allDone) state = "playing";
+        }
+    } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    End_Button.style.display = "none";
+    enemies.forEach(enemy => {
+        enemy.element.style.display = "none";
+        if (enemy.element.area) enemy.element.area.style.display = "none";
+    });
+    Bonuses.forEach(bonus => {
+        bonus.element.style.display = "none";
+    });
+    You.style.display = "none";
+    square.style.display = "none";
+    preview.style.display = "none";
+    
+    
+  
+   
+   
+
+    
+    
+  
+   
+   
+
+       
+        
+    }
+    requestAnimationFrame(draw);
+};
+
+device_check();
+setCanvas();
+resizeCanvas();
+getHighscore();
+draw();
+window.addEventListener('resize', resizeCanvas);
+</script>
+</head>
+
+</body>
+</html>
