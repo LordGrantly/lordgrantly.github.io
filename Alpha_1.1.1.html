@@ -1069,6 +1069,7 @@ preview.addEventListener("click", (event) => {
     state = "playing";
 });
 function draw() {
+if(state === gameover) return;
     const square = document.getElementById("square");
     
      turnsDisplay.textContent = Turns + "/" + Max_turns;
