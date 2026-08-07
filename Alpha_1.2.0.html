@@ -107,7 +107,7 @@ canvas {
     justify-content: center;
     font-weight: bold;
     border-radius: 6px;
-    font-size: 20px;
+    font-size: 17px;
 }
 
 #Shop_Offerings {
@@ -297,9 +297,7 @@ canvas {
             <li><b>Click inside the range</b> to preview a move, then <b>click again</b> to confirm it.</li>
             <li>Each move costs one of your <b>Moves</b>. When you run out, end your turn.</li>
             <li><b>End Turn</b> (button or Enter) advances time: enemies step toward you and new threats appear.</li>
-            <li>An <b>X</b> on the ground is a telegraphed enemy — it turns solid after a few turns, so plan around it.</li>
-            <li>Enemy colors: <span style="color:#e33">red</span> = normal, <span style="color:#ffd400">yellow</span> = fast, <span style="color:#3d6bff">blue</span> = slow with a large slowing aura, <span style="color:#a04ee0">purple</span> = big and tough to avoid.</li>
-            <li>Colored pickups grant bonuses: pink = points, blue = refill moves, gold = discount on shop items.</li>
+            <li>An <b>X</b> on the ground is a future enemy — it turns solid after a few turns, so plan around it.</li>
             <li>Spend points in the <b>Shop</b> to boost income, range, move count, and more.</li>
             <li>Shortcuts: <b>Enter</b> confirm/end turn, <b>Esc</b> close menus, <b>H</b> help.</li>
         </ul>
@@ -323,6 +321,8 @@ const You = document.getElementById("You");
 const End_Button = document.getElementById("End_Button");
 const square = document.getElementById("square");
 const Help_Overlay = document.getElementById("Help_Overlay");
+const Help_Button = document.getElementById("Help_Button");
+const Help_Close = document.getElementById("Help_Close")
 
 let canvas, ctx;
 let dpr = 1;
@@ -660,10 +660,10 @@ function updateShop() {
     Shop_Offerings.appendChild(list);
 }
 
-document.getElementById("Help_Button").addEventListener("click", () => {
+Help_Button.addEventListener("click", () => {
     Help_Overlay.style.display = "flex";
 });
-document.getElementById("Help_Close").addEventListener("click", () => {
+Help_Close.addEventListener("click", () => {
     Help_Overlay.style.display = "none";
 });
 
@@ -914,7 +914,7 @@ function draw() {
             });
             Bonuses.forEach(bonus => bonus.element.style.display = "block");
             You.style.display = "block";
-
+            Help_Button.style.display = "flex";
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let i = Bonuses.length - 1; i >= 0; i--) {
@@ -1023,6 +1023,8 @@ function draw() {
             You.style.display = "none";
             square.style.display = "none";
             preview.style.display = "none";
+            Help_Button.style.display = "none";
+            
         }
 
     requestAnimationFrame(draw);
