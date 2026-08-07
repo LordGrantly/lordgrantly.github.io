@@ -277,14 +277,14 @@ canvas {
 
 
 <div id="top-controls">
-    <div class="icon-btn" id="Help_Button" title="How to play (H)">?</div>
+    <div class="icon-btn" id="Help_Button" >?</div>
 </div>
 
 <div id="preview"></div>
 <div id="square"></div>
 <div id="End_Button">End Turn</div>
 <canvas id="mycanvas"></canvas>
-<div id="You" title="Click to open move range"></div>
+<div id="You" ></div>
 
 <div id="Shop_Button"></div>
 <div id="Shop_Offerings"></div>
@@ -295,6 +295,7 @@ canvas {
         <ul>
             <li><b>Click the green square (You)</b> to open your move range.</li>
             <li><b>Click inside the range</b> to preview a move, then <b>click again</b> to confirm it.</li>
+            <li>If an <b>enemy</b> collides with you, <b>the game ends.</b></li>
             <li>Each move costs one of your <b>Moves</b>. When you run out, end your turn.</li>
             <li><b>End Turn</b> (button or Enter) advances time: enemies step toward you and new threats appear.</li>
             <li>An <b>X</b> on the ground is a future enemy — it turns solid after a few turns, so plan around it.</li>
@@ -811,7 +812,8 @@ function addCross(type) {
         y: Math.random() * (WORLD_HEIGHT - 32),
         created: 0,
         clicked: 0,
-        type
+        type,        
+
     });
 }
 
@@ -836,7 +838,11 @@ You.addEventListener("click", () => {
 });
 
 square.addEventListener("click", (event) => {
-    if (Turns <= 0 || state !== "playing") return;
+    if (Turns <= 0  ){ 
+        square.style.display = "none"; 
+         return;
+    };
+    if(state !== "playing") return;
 
     preview.style.backgroundColor = "rgba(26, 165, 112,0.3)";
     preview.style.display = "block";
@@ -984,10 +990,11 @@ function draw() {
 
             crosses.forEach(cross => {
                 let size = 40;
-                if (cross.type === "normal") ctx.strokeStyle = "green";
+                
+                if (cross.type === "normal") {size = 40; ctx.strokeStyle = "green";}
                 else if (cross.type === "fast") { ctx.strokeStyle = "yellow"; size = 20; }
-                else if (cross.type === "slower") { ctx.strokeStyle = "blue"; size = 48; }
-                else { ctx.strokeStyle = "purple"; size = 70; }
+                else if (cross.type === "slower") { ctx.strokeStyle = "blue"; size = 50; }
+                else if (cross.type === "bigger") { ctx.strokeStyle = "purple"; size = 90; }
 
                 const spawningNextTurn = cross.clicked >= lifetime - 1;
                 if (spawningNextTurn) {
