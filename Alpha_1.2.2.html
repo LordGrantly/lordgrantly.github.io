@@ -346,9 +346,8 @@ canvas {
             <li>An <b>X</b> on the ground is a future enemy — it turns solid after a few turns, so plan around it.</li>
             <li>Spend points in the <b>Shop</b> to boost income, range, move count, and more.</li>
             <li>Shortcuts: <b>Enter</b> confirm/end turn, <b>Esc</b> close menus, <b>H</b> help.</li>
-            <li>Bosses appear every 25 turns; </li>
-            <li>Bosses: Evil Mage - faster enemy scaling</li>
-        </ul>
+            <li>Bosses appear every 15 turns; </li>
+            </ul>
         <div class="overlay-close" id="Help_Close">Got it</div>
     </div>
 </div>
@@ -533,12 +532,11 @@ function updateHud() {
 
 }
 
-// Shows a full-screen announcement banner (used for boss spawns).
 function showBossAnnouncement(text, duration = 2600) {
     clearTimeout(bossAnnouncementTimeout);
     bossAnnouncementText.textContent = text;
     bossAnnouncement.classList.remove("show");
-    // force reflow so the animation restarts if triggered again quickly
+
     void bossAnnouncement.offsetWidth;
     bossAnnouncement.classList.add("show");
     bossAnnouncementTimeout = setTimeout(() => {
@@ -670,7 +668,7 @@ function checkPlateCollision(){
 }
 
 function triggerBossSpawns(){
-    if (turn % 25 === 0 && turn !== 0) {
+    if (turn % 15 === 0 && turn !== 0) {
         const r = Math.random() * 100;
         if (r < evil_mage_chance) {
             showBossAnnouncement("⚠ BOSS INCOMING: EVIL MAGE ⚠");
@@ -838,9 +836,9 @@ function End_Turn() {
     plates.forEach(plate => {
         if (plate.pushed != true) {
             evil_mage_alive = true;
-            Enemy_step += 10;
-            Enemy_scaling += 0.5;
-            enemy_Max_points += 0.2;
+            Enemy_step += 5;
+            Enemy_scaling += 0.25;
+            enemy_Max_points += 0.05;
 
         }
     });
