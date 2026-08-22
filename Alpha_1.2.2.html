@@ -860,6 +860,7 @@ function End_Turn() {
         }
     });
     if (evil_mage_alive != true) {
+        bossAnnouncementText.innerHTML = `<span class="boss-title">EVIL MAGE DEFEATED!</span>`, 3600;
         plates.forEach(plate => {
             plate.element.remove();
         });
