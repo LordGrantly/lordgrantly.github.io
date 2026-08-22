@@ -18,7 +18,7 @@ body {
 
 canvas {
     position: fixed;
-    left: 0;
+    left: 0; 
     top: 0;
     width: 100vw;
     height: 100vh;
@@ -238,6 +238,7 @@ canvas {
     pointer-events: none;
     z-index: 7;
 }
+
 .fast   { width: 20px; height: 20px; background-color: yellow; border: 5px solid black; position: absolute; touch-action: none; pointer-events: none; z-index: 9; }
 .enemy  { width: 40px; height: 40px; background-color: green;    border: 5px solid black; position: absolute; touch-action: none; pointer-events: none; z-index: 8; }
 .slower { width: 50px; height: 50px; background-color: blue;   border: 5px solid black; position: absolute; pointer-events: none; touch-action: none; z-index: 6; }
@@ -257,7 +258,7 @@ canvas {
     pointer-events: none;
 }
 
-/* Boss announcement */
+
 #boss-announcement {
     position: fixed;
     inset: 0;
@@ -273,14 +274,26 @@ canvas {
     animation: bossFade 2.6s ease forwards;
 }
 #boss-announcement .boss-text {
-    font-size: clamp(24px, 6vw, 56px);
     font-weight: 900;
     color: #ff3b3b;
     text-shadow: 0 0 16px rgba(255,0,0,0.8), 0 0 32px rgba(255,0,0,0.45);
-    letter-spacing: 2px;
     text-align: center;
     padding: 20px 36px;
     max-width: 90vw;
+    box-sizing: border-box;
+}
+#boss-announcement .boss-title {
+    display: block;
+    font-size: clamp(20px, 6vw, 56px);
+    letter-spacing: 2px;
+}
+#boss-announcement .boss-sub {
+    display: block;
+    font-size: clamp(13px, 3.2vw, 24px);
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-top: 8px;
+    color: #ffb3b3;
 }
 @keyframes bossFade {
     0%   { opacity: 0; }
@@ -346,8 +359,9 @@ canvas {
             <li>An <b>X</b> on the ground is a future enemy — it turns solid after a few turns, so plan around it.</li>
             <li>Spend points in the <b>Shop</b> to boost income, range, move count, and more.</li>
             <li>Shortcuts: <b>Enter</b> confirm/end turn, <b>Esc</b> close menus, <b>H</b> help.</li>
-            <li>Bosses appear every 15 turns; </li>
-            </ul>
+            <li>Bosses appear every 25 turns; </li>
+            <li>Bosses: Evil Mage - faster enemy scaling</li>
+        </ul>
         <div class="overlay-close" id="Help_Close">Got it</div>
     </div>
 </div>
@@ -412,8 +426,8 @@ let evil_mage_alive = false;
 let bonus_spawned = false;
 let bonus_chance = 10;
 let bonus_type = "money";
-const money_bonus_chance = 65;
-const reset_turns_bonus_chance = 90; // 65 + -----> 25 <-----
+const money_bonus_chance = 65; // 65
+const reset_turns_bonus_chance = 90; // 65 +  -----> 25 <-----
 const discount_bonus_chance = 100; // 65 + 25 + -----> 10 <-----
 let discount_Turns_Left = 0;
 let CanRemoveDiscount = false;
@@ -435,7 +449,7 @@ const offerings = [
         effect: () => { PointsInc += 1; }
     },
     {
-        cost: 40, multi: 2.5,
+        cost: 40, multi: 3,
         name_change: () => `Max Moves (${Max_turns} -> ${Max_turns + 1})`,
         effect: () => { Max_turns += 1; Turns += 1; }
     },
@@ -532,10 +546,13 @@ function updateHud() {
 
 }
 
-function showBossAnnouncement(text, duration = 2600) {
+function showBossAnnouncement(title, subtitle = "", duration = 2600) {
     clearTimeout(bossAnnouncementTimeout);
-    bossAnnouncementText.textContent = text;
+    const titleHtml = `<span class="boss-title">${title}</span>`;
+    const subHtml = subtitle ? `<span class="boss-sub">${subtitle}</span>` : "";
+    bossAnnouncementText.innerHTML = titleHtml + subHtml;
     bossAnnouncement.classList.remove("show");
+    bossAnnouncement.style.animationDuration = (duration / 1000) + "s";
 
     void bossAnnouncement.offsetWidth;
     bossAnnouncement.classList.add("show");
@@ -550,8 +567,8 @@ function device_check() {
         Enemy_scaling = 2;
         Enemy_step = 70;
         bonus_chance = 5;
-        offerings[4].effect = () => { Enemy_step -= 30; };
-        offerings[4].name_change = () => `Weaker Enemies (${Enemy_step} -> ${Enemy_step - 30})`;
+        offerings[5].effect = () => { Enemy_step -= 30; };
+        offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} -> ${Enemy_step - 30})`;
         offerings[0].effect = () => { bonus_chance += 5; };
         offerings[0].name_change = () => `More Bonuses (${bonus_chance}% -> ${bonus_chance + 5}%)`;
         Shop_Button.style.width = "100px";
@@ -671,7 +688,7 @@ function triggerBossSpawns(){
     if (turn % 15 === 0 && turn !== 0) {
         const r = Math.random() * 100;
         if (r < evil_mage_chance) {
-            showBossAnnouncement("⚠ BOSS INCOMING: EVIL MAGE ⚠");
+            showBossAnnouncement("⚠ EVIL MAGE INCOMING ⚠", "Step on the red plates to weaken him!", 3600);
             let plates_created = 0;
             while(plates_created < 3){
                 const plateX = Math.random() * (WORLD_WIDTH - 25);
@@ -836,8 +853,8 @@ function End_Turn() {
     plates.forEach(plate => {
         if (plate.pushed != true) {
             evil_mage_alive = true;
-            Enemy_step += 5;
-            Enemy_scaling += 0.25;
+            Enemy_step += 2;
+            Enemy_scaling += 0.1;
             enemy_Max_points += 0.05;
 
         }
@@ -1198,4 +1215,3 @@ window.addEventListener("resize", resizeCanvas);
 </script>
 </body>
 </html>
-
