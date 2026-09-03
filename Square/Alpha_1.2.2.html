@@ -567,8 +567,8 @@ function device_check() {
         Enemy_scaling = 2;
         Enemy_step = 70;
         bonus_chance = 5;
-        offerings[5].effect = () => { Enemy_step -= 30; };
-        offerings[5].name_change = () => `Weaker Enemies (${Enemy_step} -> ${Enemy_step - 30})`;
+        offerings[4].effect = () => { Enemy_step -= 30; };
+        offerings[4].name_change = () => `Weaker Enemies (${Enemy_step} -> ${Enemy_step - 30})`;
         offerings[0].effect = () => { bonus_chance += 5; };
         offerings[0].name_change = () => `More Bonuses (${bonus_chance}% -> ${bonus_chance + 5}%)`;
         Shop_Button.style.width = "100px";
