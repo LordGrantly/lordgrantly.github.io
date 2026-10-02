@@ -21,16 +21,18 @@
     <script>
         let Who = Math.floor(Math.random() * 3) + 1;
         let number = Math.floor(Math.random() * 800) + 1;
-        let clicked = 0;
+        let clicked = 1;
         document.addEventListener('click', function() {
             var textElement = document.getElementById('text');
             clicked++;
-            if (Who === clicked) {
+            if (Who === 2*clicked) {
                 textElement.textContent = 'You are the impostor!';
-            } else {
+            } else if (clicked % 2 === 0) {
                 textElement.textContent = 'number: ' + number;
+            }else {
+                textElement.textContent = 'Next player';
             }
-            if (clicked > 3) {
+            if (clicked > 6) {
                 clicked = 0;
                 Who = Math.floor(Math.random() * 3) + 1;
                 number = Math.floor(Math.random() * 800) + 1;
