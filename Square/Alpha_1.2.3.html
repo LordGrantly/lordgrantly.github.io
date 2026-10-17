@@ -94,6 +94,8 @@ canvas {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    text-align: center;
+    line-height: 40px; 
 }
 #Shop_Button:hover { transform: translateY(-2px); filter: brightness(1.08); }
 #Shop_Button:active { transform: translateY(4px); }
@@ -427,15 +429,15 @@ let fast_chance = 20;
 let slow_chance = 40;
 let bigger_chance = 50;
 
-let _mage_chance = 100;
-let _mage_alive = false;
+let evil_mage_chance = 100;
+let evil_mage_alive = false;
 
 let bonus_spawned = false;
 let bonus_chance = 10;
 let bonus_type = "money";
-const money_bonus_chance = 40; // 40
-const reset_turns_bonus_chance = 75; // 40 + 35 -----> 25 <-----
-const discount_bonus_chance = 100; // 40 + 35 + -----> 25 <-----
+const money_bonus_chance = 65; // 65
+const reset_turns_bonus_chance = 90; // 65 +  -----> 25 <-----
+const discount_bonus_chance = 100; // 65 + 25 + -----> 10 <-----
 let discount_Turns_Left = 0;
 let CanRemoveDiscount = false;
 
@@ -694,8 +696,8 @@ function checkPlateCollision(){
 function triggerBossSpawns(){
     if (turn % 15 === 0 && turn !== 0) {
         const r = Math.random() * 100;
-        if (r < _mage_chance) {
-            showBossAnnouncement("⚠  MAGE INCOMING ⚠", "Step on the red plates to weaken him!", 3600);
+        if (r < evil_mage_chance) {
+            showBossAnnouncement("⚠ EVIL MAGE INCOMING ⚠", "Step on the red plates to weaken him!", 3600);
             let plates_created = 0;
             while(plates_created < 3){
                 const plateX = Math.random() * (WORLD_WIDTH - 25);
@@ -851,7 +853,7 @@ function End_Turn() {
     if (state !== "playing") return;
     frosen = false;
     state = "waiting";
-    _mage_alive = false;
+    evil_mage_alive = false;
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
     preview.style.display = "none";
     turn += 1;
