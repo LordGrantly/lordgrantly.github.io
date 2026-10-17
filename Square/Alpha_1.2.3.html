@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alpha 1.2.2</title>
+<title>Alpha 1.2.3</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -419,23 +419,23 @@ let frosen = false;
 let shield = false;
 let shield_poped = false;
 
-let Enemy_step = 160;
-let Enemy_scaling = 5;
-let enemy_Max_points = 2;
-let enemy_points = 2;
+let Enemy_step = 120;
+let Enemy_scaling = 4;
+let enemy_Max_points = 1;
+let enemy_points = 1;
 let fast_chance = 20;
 let slow_chance = 40;
 let bigger_chance = 50;
 
-let evil_mage_chance = 100;
-let evil_mage_alive = false;
+let _mage_chance = 100;
+let _mage_alive = false;
 
 let bonus_spawned = false;
 let bonus_chance = 10;
 let bonus_type = "money";
-const money_bonus_chance = 65; // 65
-const reset_turns_bonus_chance = 90; // 65 +  -----> 25 <-----
-const discount_bonus_chance = 100; // 65 + 25 + -----> 10 <-----
+const money_bonus_chance = 40; // 40
+const reset_turns_bonus_chance = 75; // 40 + 35 -----> 25 <-----
+const discount_bonus_chance = 100; // 40 + 35 + -----> 25 <-----
 let discount_Turns_Left = 0;
 let CanRemoveDiscount = false;
 
@@ -694,8 +694,8 @@ function checkPlateCollision(){
 function triggerBossSpawns(){
     if (turn % 15 === 0 && turn !== 0) {
         const r = Math.random() * 100;
-        if (r < evil_mage_chance) {
-            showBossAnnouncement("⚠ EVIL MAGE INCOMING ⚠", "Step on the red plates to weaken him!", 3600);
+        if (r < _mage_chance) {
+            showBossAnnouncement("⚠  MAGE INCOMING ⚠", "Step on the red plates to weaken him!", 3600);
             let plates_created = 0;
             while(plates_created < 3){
                 const plateX = Math.random() * (WORLD_WIDTH - 25);
@@ -851,7 +851,7 @@ function End_Turn() {
     if (state !== "playing") return;
     frosen = false;
     state = "waiting";
-    evil_mage_alive = false;
+    _mage_alive = false;
     square.style.backgroundColor = "rgba(0,0,100,0.6)";
     preview.style.display = "none";
     turn += 1;
@@ -860,9 +860,9 @@ function End_Turn() {
     plates.forEach(plate => {
         if (plate.pushed != true) {
             evil_mage_alive = true;
-            Enemy_step += 2;
-            Enemy_scaling += 0.1;
-            enemy_Max_points += 0.05;
+            Enemy_step += 1;
+            Enemy_scaling += 0.05;
+            enemy_Max_points += 0.01;
 
         }
     });
