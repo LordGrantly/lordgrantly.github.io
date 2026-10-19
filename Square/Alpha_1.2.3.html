@@ -435,9 +435,9 @@ let evil_mage_alive = false;
 let bonus_spawned = false;
 let bonus_chance = 10;
 let bonus_type = "money";
-const money_bonus_chance = 65; // 65
-const reset_turns_bonus_chance = 90; // 65 +  -----> 25 <-----
-const discount_bonus_chance = 100; // 65 + 25 + -----> 10 <-----
+const money_bonus_chance = 40; // 40
+const reset_turns_bonus_chance = 65; // 40 +  -----> 25 <-----
+const discount_bonus_chance = 100; // 65 + 25 + -----> 35 <-----
 let discount_Turns_Left = 0;
 let CanRemoveDiscount = false;
 
@@ -464,7 +464,7 @@ const offerings = [
     },
     {
         cost: 10, multi: 1.5,
-        name_change: () => `Stronger Player (${true_range} -> ${true_range + 35})`,
+        name_change: () => `Stronger Player (${(true_range-50)/2} -> ${(true_range-50)/2 + 35})`,
         effect: () => { true_range += 35; range += 35; }
     },
     
