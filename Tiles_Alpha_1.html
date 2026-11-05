@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiles_Alpha_1.0</title>
+    <style>
+        #Enemy{
+            width : 40px ;
+            height : 40px ;
+            background-color : 'red';
+            border-color : black;
+            border: 5px;
+        }
+        .Tile{
+            width : 45px ;
+            height : 45px ;
+            background-color : rgba(0, 255, 0, 0.1);
+            border-color : black;
+            border: 5px;
+        }
+        #Player{
+            position: absolute;
+            left: 120px;
+            top: 120px;
+            width: 40px;
+            height: 40px;
+            background-color: blue;
+            border-color: black;
+            display: block;
+        }
+        .range_tile{
+          width : 45px ;
+          height : 45px ;
+          background-color : rgba(255, 0, 0, 0.1);
+          border-color : black;
+          border: 5px;
+        }
+        .GameButton{
+          position: fixed;
+          bottom: 20px;
+          z-index: 10;
+          padding: 12px 22px;
+          font-size: 18px;
+          font-weight: bold;
+          color: white;
+          background-color: #333;
+          border: 2px solid black;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        .GameButton:hover{
+          background-color: #555;
+        }
+        #EndTurnBtn{
+          right: 20px;
+        }
+        #InventoryBtn{
+          left: 20px;
+        }
+
+        /* Black overlay between the game and the inventory */
+        #InventoryDim{
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          z-index: 20;
+        }
+        #InventoryPanel, #CraftingPanel{
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 85vw;
+          height: 85vh;
+          box-sizing: border-box;
+          padding: 20px;
+          background-color: #2b2b2b;
+          color: white;
+          border: 4px solid black;
+          border-radius: 12px;
+          z-index: 21;
+          overflow: auto;
+        }
+        #InventoryPanel h2, #CraftingPanel h2{
+          margin: 0 0 15px 0;
+        }
+        #InventoryClose, #CraftingClose{
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          padding: 6px 14px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+        #InventoryGrid{
+          display: grid;
+          grid-template-columns: repeat(auto-fill, 70px);
+          gap: 8px;
+        }
+        .InventorySlot{
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          text-align: center;
+          width: 70px;
+          height: 70px;
+          background-color: #444;
+          border: 2px solid #111;
+          border-radius: 6px;
+        }
+        #CraftingBtn{
+          position: absolute;
+          top: 15px;
+          right: 95px;
+          padding: 6px 14px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+        #EquippedBar{
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin-bottom: 15px;
+        }
+        .EquipSlot{
+          padding: 8px 12px;
+          background-color: #3a3a3a;
+          border-radius: 6px;
+        }
+        .EquipSlot button, #ItemDetails button{
+          margin-left: 8px;
+          padding: 4px 12px;
+          cursor: pointer;
+        }
+        .InventorySlot.selected{
+          border-color: orange;
+        }
+        #ItemDetails{
+          margin-top: 20px;
+          padding: 12px;
+          min-height: 50px;
+          background-color: #3a3a3a;
+          border-radius: 6px;
+        }
+        #UndoBtn{
+          right: 150px;
+        }
+        #CraftItems{
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 15px;
+        }
+        .CraftItem{
+          width: 80px;
+          height: 70px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          background-color: #444;
+          border: 2px solid #111;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+        .CraftItem.selected{
+          border-color: orange;
+          background-color: #66532a;
+        }
+        .CraftRecipe{
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 15px;
+          padding: 10px;
+          margin-bottom: 8px;
+          background-color: #3a3a3a;
+          border-radius: 6px;
+        }
+        .CraftRecipe button{
+          padding: 6px 16px;
+          font-size: 15px;
+          cursor: pointer;
+        }
+        body{
+          margin: 0;
+          overflow: hidden;
+        }
+        canvas{
+          display: block;
+        }
+    </style>
+</head>
+<body>
+  <canvas id="mycanvas"></canvas>
+  <div id="Player"></div>
+
+  <button id="InventoryBtn" class="GameButton">Inventory</button>
+  <button id="UndoBtn" class="GameButton">Undo</button>
+  <button id="EndTurnBtn" class="GameButton">End Turn</button>
+
+  <div id="InventoryDim"></div>
+  <div id="InventoryPanel">
+    <h2>Inventory</h2>
+    <button id="InventoryClose">Close</button>
+    <button id="CraftingBtn">Crafting</button>
+    <div id="EquippedBar"></div>
+    <div id="InventoryGrid"></div>
+    <div id="ItemDetails"></div>
+  </div>
+
+  <div id="CraftingPanel">
+    <h2>Crafting</h2>
+    <button id="CraftingClose">Back</button>
+    <p>Click the resources you want to use:</p>
+    <div id="CraftItems"></div>
+    <h3>Recipes</h3>
+    <div id="CraftRecipes"></div>
+  </div>
+
+  <script>
+    let tileSize = 50;
+    let PlayerMoving = false;
+    let PlayerX = 100;
+    let PlayerY = 100;
+    let maxStamina = 3;
+    let stamina = maxStamina;
+
+    // --- Terrain mining settings ---
+    // Add more terrain types here (e.g. rock) to make them minable too.
+    // item: what you get, amount: how many, cost: stamina used, becomes: terrain left behind
+    let terrainResources = {
+      forest: { item: "Wood", amount: 1, cost: 3, becomes: "plain", bonus: { item: "Apple", chance: 0.25 } },
+      rock:   { item: "Stone", amount: 1, cost: 4, becomes: "plain" },
+    };
+    let inventory = {}; // item name -> count
+
+    // --- Item settings ---
+    // Items not listed here are plain crafting materials.
+    // consumable: "Use" it for an effect. equipment: "Equip" it into a slot.
+    let itemData = {
+      "Apple":        { type: "consumable", staminaRestore: 1, description: "Restores 1 stamina." },
+      "Wooden Axe":   { type: "equipment", slot: "tool", mineDiscount: 1, description: "Tool: chopping and mining cost 1 less stamina (minimum 1)." },
+      "Stone Axe":    { type: "equipment", slot: "tool", mineDiscount: 2, yieldBonus: 1, description: "Tool: chopping and mining cost 2 less stamina (minimum 1) and give +1 resource." },
+      "Wooden Sword": { type: "equipment", slot: "weapon", damage: 2, description: "Weapon: deals 2 damage (fists deal 1)." },
+      "Stone Sword":  { type: "equipment", slot: "weapon", damage: 3, description: "Weapon: deals 3 damage." },
+    };
+    let equipped = { tool: null, weapon: null }; // slot -> item name
+
+    let hour = 8;  // 0-23
+    let day = 1;
+
+    const darknessByHour = [0.6,0.6,0.6,0.6,0.6,0.45,0.25,0.1, 0,0,0,0,0,0,0,0,0, 0.1,0.25,0.4,0.5,0.55,0.6,0.6];
+    let displayDarkness = darknessByHour[hour];
+
+
+    let maxHP = 10;
+    let hp = maxHP;
+    let mobs = []; // { type, gx, gy, hp } (grid coordinates)
+    const mobTypes = {
+      slime: {
+        hp: 3, damage: 1,
+        stamina: 2,        // stamina refilled every turn
+        moveCost: 1,       // per tile walked
+        attackCost: 1,     // per attack (so 2 stamina = up to 2 attacks)
+        healCost: 1,       // to heal while it feels safe
+        heal: 1,           // HP restored by a heal
+        safeDistance: 6,  // farther than this (walking distance) from the player = feels safe
+      },
+    };
+    const regenStaminaCost = 1; // a hurt player heals 1 HP at end of turn, paid with next turn's stamina
+    let slimeSpawnChance = 0.6;  // chance per night turn that a slime spawns
+    const maxMobs = 6;
+    const spawnMinDist = 5, spawnMaxDist = 9; // spawn ring around the player (in tiles)
+    const aggroRange = 20;       // mobs farther than this (walking distance) don't chase
+    const attackCost = 1;        // stamina to hit a mob
+    let message = '';
+    let messageUntil = 0;
+    function showMessage(text) { message = text; messageUntil = Date.now() + 4000; }
+
+    function isDaytime() { return hour >= 6 && hour < 18; }
+    function timeLabel() {
+      return `Day ${day}, ${String(hour).padStart(2, '0')}:00 (${isDaytime() ? 'Day' : 'Night'})`;
+    }
+    let Player = document.getElementById('Player');
+    let tiles = [];
+    // --- Forest generation settings ---
+    let forestSeedChance = 0.02;   // chance (0-1) a tile is the "original" tree of a cluster
+    let clusterRadius = 4;         // how far a cluster can spread from an original tree
+    let clusterMaxChance = 0.6;    // extra tree chance right next to an original tree
+    let worldSeed = Math.floor(Math.random() * 1e9);
+    let rockChance = 0.04;         // chance (0-1) a non-forest tile is a rock
+
+    // Deterministic random number (0-1) for a tile, so a tile's result never
+    // depends on the order the map gets generated in.
+    function tileRandom(gx, gy, salt) {
+      let h = (Math.imul(gx, 374761393) + Math.imul(gy, 668265263) + Math.imul(salt, 1442695041) + worldSeed) | 0;
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      h ^= h >>> 16;
+      h = Math.imul(h, 2246822519);
+      h ^= h >>> 13;
+      return (h >>> 0) / 4294967296;
+    }
+
+    function isForest(gx, gy) {
+      // 1. Rare original trees
+      if (tileRandom(gx, gy, 1) < forestSeedChance) return true;
+
+      // 2. Chance to grow near original trees, weaker the farther away they are
+      let noTreeChance = 1;
+      for (let dx = -clusterRadius; dx <= clusterRadius; dx++) {
+        for (let dy = -clusterRadius; dy <= clusterRadius; dy++) {
+          if (dx === 0 && dy === 0) continue;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > clusterRadius) continue;
+          if (tileRandom(gx + dx, gy + dy, 1) < forestSeedChance) {
+            const chance = clusterMaxChance * (1 - dist / (clusterRadius + 1));
+            noTreeChance *= (1 - chance);
+          }
+        }
+      }
+      return tileRandom(gx, gy, 2) < 1 - noTreeChance;
+    }
+    let worldTiles = new Map();
+    let reachable = new Map(); // tiles the player can actually walk to (key -> steps)
+    let cameraX = 0;
+    let cameraY = 0;
+    let cameraOffsetX = 0;
+    let cameraOffsetY = 0;
+    Player.style.position = 'absolute';
+    Player.style.left = PlayerX + 'px';
+    Player.style.top = PlayerY + 'px';
+
+    function getTileKey(gridX, gridY) {
+      return `${gridX},${gridY}`;
+    }
+
+    function setCanvas() {
+      canvas = document.getElementById('mycanvas');
+      ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => {
+      setCanvas();
+    });
+
+    function getOrCreateTile(gridX, gridY) {
+      const key = getTileKey(gridX, gridY);
+      const x = gridX * tileSize;
+      const y = gridY * tileSize;
+
+      if (!worldTiles.has(key)) {
+        let type = "plain";
+        if (isForest(gridX, gridY)) type = "forest";
+        else if (tileRandom(gridX, gridY, 3) < rockChance) type = "rock";
+        const canMoveTo = type === "plain";
+
+        worldTiles.set(key, {
+          x,
+          y,
+          type,
+          CanMoveTo: canMoveTo,
+          Enemy: false,
+        });
+      }
+
+      return worldTiles.get(key);
+    }
+
+    // Flood-fill outward from the player. Only walkable tiles are expanded,
+    // so blocked tiles (forest, enemies) can't be jumped over.
+    function computeReachable() {
+      reachable = new Map();
+      const startGX = Math.round(PlayerX / tileSize);
+      const startGY = Math.round(PlayerY / tileSize);
+
+      reachable.set(getTileKey(startGX, startGY), 0);
+      const queue = [{ gx: startGX, gy: startGY, dist: 0 }];
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+      while (queue.length > 0) {
+        const cur = queue.shift();
+        if (cur.dist >= stamina) continue;
+
+        for (const [dx, dy] of dirs) {
+          const nx = cur.gx + dx;
+          const ny = cur.gy + dy;
+          const key = getTileKey(nx, ny);
+          if (reachable.has(key)) continue;
+
+          const tile = getOrCreateTile(nx, ny);
+          if (!tile.CanMoveTo || tile.Enemy) continue; // blocked: can't enter or pass through
+
+          reachable.set(key, cur.dist + 1);
+          queue.push({ gx: nx, gy: ny, dist: cur.dist + 1 });
+        }
+      }
+    }
+
+    function generateVisibleMap() {
+      const margin = 5;
+
+      const cameraX = PlayerX + cameraOffsetX;
+      const cameraY = PlayerY + cameraOffsetY;
+
+      const minX = Math.floor((cameraX - canvas.width / 2) / tileSize) - margin;
+      const maxX = Math.floor((cameraX + canvas.width / 2) / tileSize) + margin;
+      const minY = Math.floor((cameraY - canvas.height / 2) / tileSize) - margin;
+      const maxY = Math.floor((cameraY + canvas.height / 2) / tileSize) + margin;
+
+      tiles = [];
+
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          tiles.push(getOrCreateTile(x, y));
+        }
+      }
+
+      computeReachable();
+    }
+
+    // --- End turn + inventory ---
+    let openMenu = null; // 'inventory', 'crafting' or null
+    const inventorySlots = 24;
+    const inventoryGrid = document.getElementById('InventoryGrid');
+    const slotElements = [];
+    for (let i = 0; i < inventorySlots; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'InventorySlot';
+      inventoryGrid.appendChild(slot);
+      slotElements.push(slot);
+    }
+
+    let selectedItem = null;
+
+    function renderInventory() {
+      const names = Object.keys(inventory).filter(n => inventory[n] > 0);
+      if (selectedItem && !names.includes(selectedItem)) selectedItem = null;
+
+      slotElements.forEach((slot, i) => {
+        const n = names[i];
+        slot.innerHTML = n ? `<b>${n}</b><span>x${inventory[n]}</span>` : '';
+        slot.classList.toggle('selected', !!n && n === selectedItem);
+        slot.onclick = n ? () => { selectedItem = n; renderInventory(); } : null;
+      });
+      renderEquipped();
+      renderItemDetails();
+    }
+
+    function renderEquipped() {
+      const bar = document.getElementById('EquippedBar');
+      bar.innerHTML = '';
+      for (const slot of Object.keys(equipped)) {
+        const box = document.createElement('div');
+        box.className = 'EquipSlot';
+        const label = slot.charAt(0).toUpperCase() + slot.slice(1);
+        box.innerHTML = `<b>${label}:</b> ${equipped[slot] || 'empty'}`;
+        if (equipped[slot]) {
+          const btn = document.createElement('button');
+          btn.textContent = 'Unequip';
+          btn.onclick = () => unequipItem(slot);
+          box.appendChild(btn);
+        }
+        bar.appendChild(box);
+      }
+    }
+
+    function renderItemDetails() {
+      const box = document.getElementById('ItemDetails');
+      box.innerHTML = '';
+      if (!selectedItem) {
+        box.textContent = 'Click an item to see what it does.';
+        return;
+      }
+      const d = itemData[selectedItem] || {};
+      const info = document.createElement('div');
+      info.innerHTML = `<b>${selectedItem}</b> x${inventory[selectedItem]}<br>${d.description || 'A crafting material.'}`;
+      box.appendChild(info);
+
+      if (d.type === 'consumable') {
+        const btn = document.createElement('button');
+        btn.textContent = 'Use';
+        btn.disabled = !!d.staminaRestore && stamina >= maxStamina; // don't waste it
+        btn.onclick = () => useItem(selectedItem);
+        box.appendChild(btn);
+      }
+      if (d.type === 'equipment') {
+        const btn = document.createElement('button');
+        btn.textContent = 'Equip';
+        btn.onclick = () => equipItem(selectedItem);
+        box.appendChild(btn);
+      }
+    }
+
+    function useItem(name) {
+      const d = itemData[name];
+      if (!d || d.type !== 'consumable' || !inventory[name]) return;
+      if (d.staminaRestore && stamina >= maxStamina) return;
+      pushUndo(null);
+      inventory[name]--;
+      if (d.staminaRestore) stamina = Math.min(maxStamina, stamina + d.staminaRestore);
+      renderInventory();
+      generateVisibleMap(); // stamina changed, so reachable tiles change
+    }
+
+    function equipItem(name) {
+      const d = itemData[name];
+      if (!d || d.type !== 'equipment' || !inventory[name]) return;
+      pushUndo(null);
+      const old = equipped[d.slot];
+      inventory[name]--;
+      if (old) inventory[old] = (inventory[old] || 0) + 1; // swap the old item back
+      equipped[d.slot] = name;
+      renderInventory();
+    }
+
+    function unequipItem(slot) {
+      const name = equipped[slot];
+      if (!name) return;
+      pushUndo(null);
+      equipped[slot] = null;
+      inventory[name] = (inventory[name] || 0) + 1;
+      renderInventory();
+    }
+    renderInventory();
+
+    // --- Mining ---
+    function isAdjacentToPlayer(tile) {
+      const dx = Math.abs(tile.x - PlayerX) / tileSize;
+      const dy = Math.abs(tile.y - PlayerY) / tileSize;
+      return dx + dy === 1; // directly up, down, left or right
+    }
+
+    function mineCost(res) {
+      const tool = equipped.tool && itemData[equipped.tool];
+      const discount = tool && tool.mineDiscount ? tool.mineDiscount : 0;
+      return Math.max(1, res.cost - discount);
+    }
+
+    function mineYield(res) {
+      const tool = equipped.tool && itemData[equipped.tool];
+      return res.amount + (tool && tool.yieldBonus ? tool.yieldBonus : 0);
+    }
+
+    function canMine(tile) {
+      const res = terrainResources[tile.type];
+      return !!res && isAdjacentToPlayer(tile) && stamina >= mineCost(res);
+    }
+
+    function mineTile(tile) {
+      const res = terrainResources[tile.type];
+      pushUndo({ tile, type: tile.type, CanMoveTo: tile.CanMoveTo });
+      stamina -= mineCost(res);
+      inventory[res.item] = (inventory[res.item] || 0) + mineYield(res);
+      if (res.bonus && Math.random() < res.bonus.chance) {
+        inventory[res.bonus.item] = (inventory[res.bonus.item] || 0) + 1;
+      }
+      tile.type = res.becomes;
+      tile.CanMoveTo = res.becomes !== "forest";
+      renderInventory();
+      generateVisibleMap(); // the cleared tile may open up new paths
+    }
+
+    // --- Mobs ---
+    function mobAt(gx, gy) {
+      return mobs.find(m => m.gx === gx && m.gy === gy);
+    }
+
+    function addMob(type, gx, gy) {
+      mobs.push({ type, gx, gy, hp: mobTypes[type].hp, stamina: mobTypes[type].stamina });
+      getOrCreateTile(gx, gy).Enemy = true; // blocks player movement
+    }
+
+    function setMobs(list) {
+      mobs.forEach(m => { getOrCreateTile(m.gx, m.gy).Enemy = false; });
+      mobs = list;
+      mobs.forEach(m => { getOrCreateTile(m.gx, m.gy).Enemy = true; });
+    }
+
+    function clearMobs() { setMobs([]); }
+
+    function weaponDamage() {
+      const w = equipped.weapon && itemData[equipped.weapon];
+      return w && w.damage ? w.damage : 1;
+    }
+
+    function canAttack(tile) {
+      return tile.Enemy && isAdjacentToPlayer(tile) && stamina >= attackCost;
+    }
+
+    function attackMob(tile) {
+      const mob = mobAt(tile.x / tileSize, tile.y / tileSize);
+      if (!mob) return;
+      pushUndo(null);
+      stamina -= attackCost;
+      mob.hp -= weaponDamage();
+      if (mob.hp <= 0) {
+        tile.Enemy = false;
+        mobs = mobs.filter(m => m !== mob);
+      }
+      generateVisibleMap();
+    }
+
+    function spawnSlimes() {
+      if (mobs.length >= maxMobs || Math.random() >= slimeSpawnChance) return;
+      const pgx = PlayerX / tileSize;
+      const pgy = PlayerY / tileSize;
+      const range = spawnMaxDist * 2 + 1;
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const gx = pgx + Math.floor(Math.random() * range) - spawnMaxDist;
+        const gy = pgy + Math.floor(Math.random() * range) - spawnMaxDist;
+        if (Math.max(Math.abs(gx - pgx), Math.abs(gy - pgy)) < spawnMinDist) continue;
+        const tile = getOrCreateTile(gx, gy);
+        if (!tile.CanMoveTo || tile.Enemy) continue;
+        addMob("slime", gx, gy);
+        return;
+      }
+    }
+
+    // Each mob spends its stamina: heal if it feels safe, otherwise chase and attack.
+    function moveMobs() {
+      const pgx = PlayerX / tileSize;
+      const pgy = PlayerY / tileSize;
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+      
+      const dist = new Map();
+      dist.set(getTileKey(pgx, pgy), 0);
+      const queue = [[pgx, pgy]];
+      for (let qi = 0; qi < queue.length; qi++) {
+        const [x, y] = queue[qi];
+        const d = dist.get(getTileKey(x, y));
+        if (d >= aggroRange) continue;
+        for (const [dx, dy] of dirs) {
+          const nx = x + dx, ny = y + dy;
+          const k = getTileKey(nx, ny);
+          if (dist.has(k) || !getOrCreateTile(nx, ny).CanMoveTo) continue;
+          dist.set(k, d + 1);
+          queue.push([nx, ny]);
+        }
+      }
+      const distOf = m => dist.has(getTileKey(m.gx, m.gy)) ? dist.get(getTileKey(m.gx, m.gy)) : Infinity;
+
+      let totalDamage = 0;
+      [...mobs].sort((a, b) => distOf(a) - distOf(b)).forEach(m => {
+        const type = mobTypes[m.type];
+
+        if (distOf(m) > type.safeDistance && m.hp < type.hp && m.stamina >= type.healCost) {
+          // Far from the player and hurt: rest and heal
+          m.stamina -= type.healCost;
+          m.hp = Math.min(type.hp, m.hp + type.heal);
+        } else {
+          // Walk toward the player, spending stamina per tile
+          while (m.stamina >= type.moveCost) {
+            const d = distOf(m);
+            if (d === Infinity || d <= 1) break; // out of range, or already next to the player
+            const next = dirs
+              .map(([dx, dy]) => [m.gx + dx, m.gy + dy])
+              .find(([nx, ny]) => dist.get(getTileKey(nx, ny)) === d - 1 && !getOrCreateTile(nx, ny).Enemy);
+            if (!next) break; // path blocked by other mobs
+            m.stamina -= type.moveCost;
+            getOrCreateTile(m.gx, m.gy).Enemy = false;
+            m.gx = next[0];
+            m.gy = next[1];
+            getOrCreateTile(m.gx, m.gy).Enemy = true;
+          }
+         
+          while (distOf(m) === 1 && m.stamina >= type.attackCost) {
+            m.stamina -= type.attackCost;
+            totalDamage += type.damage;
+          }
+        }
+        m.stamina = type.stamina; // refill for next turn
+      });
+
+      if (totalDamage > 0) {
+        hp -= totalDamage;
+        showMessage(`Slimes hit you for ${totalDamage}!`);
+      }
+    }
+
+    function playerDies() {
+      clearMobs();
+      PlayerX = 100;
+      PlayerY = 100;
+      cameraOffsetX = 0;
+      cameraOffsetY = 0;
+      hp = maxHP;
+      
+    }
+
+    function runMobTurn() {
+      
+      moveMobs();
+      if (!isDaytime()) spawnSlimes(); 
+      if (hp <= 0) playerDies();
+    }
+
+    function drawMobs(cameraX, cameraY) {
+      mobs.forEach(m => {
+        const sx = m.gx * tileSize - cameraX + canvas.width / 2;
+        const sy = m.gy * tileSize - cameraY + canvas.height / 2;
+        const cx = sx + tileSize / 2;
+        const cy = sy + tileSize / 2 + 4;
+
+        ctx.fillStyle = '#3fcf3f';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 19, 15, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+
+        const barW = tileSize - 10;
+        ctx.fillStyle = 'red';
+        ctx.fillRect(sx + 5, sy + 3, barW, 5);
+        ctx.fillStyle = 'lime';
+        ctx.fillRect(sx + 5, sy + 3, barW * m.hp / mobTypes[m.type].hp, 5);
+
+        
+        }
+      );
+    }
+
+    
+    let undoStack = [];
+
+    function pushUndo(tileChange) {
+      undoStack.push({
+        PlayerX, PlayerY, stamina,
+        inventory: { ...inventory },
+        equipped: { ...equipped },
+        mobs: mobs.map(m => ({ ...m })),
+        tileChange, // { tile, type, CanMoveTo } if a tile was mined
+      });
+    }
+
+    function undo() {
+      const state = undoStack.pop();
+      if (!state) return;
+      PlayerX = state.PlayerX;
+      PlayerY = state.PlayerY;
+      stamina = state.stamina;
+      inventory = state.inventory;
+      equipped = state.equipped;
+      setMobs(state.mobs);
+      if (state.tileChange) {
+        state.tileChange.tile.type = state.tileChange.type;
+        state.tileChange.tile.CanMoveTo = state.tileChange.CanMoveTo;
+      }
+      renderInventory();
+      renderCrafting();
+      generateVisibleMap();
+    }
+
+    function endTurn() {
+      stamina = maxStamina;
+      // Healing is paid for with stamina: a hurt player starts the turn with less
+      if (hp < maxHP) {
+        hp++;
+        stamina = Math.max(0, maxStamina - regenStaminaCost);
+      }
+      undoStack = []; // can't undo across turns
+      hour++;
+      if (hour >= 24) { hour = 0; day++; }
+      runMobTurn();
+      renderInventory(); // refresh Use buttons for the new stamina
+      generateVisibleMap();
+    }
+
+    // --- Crafting ---
+    // ingredients: what gets used up, amount: how many you get
+    let recipes = [
+      { name: "Plank",        ingredients: { Wood: 1 },            amount: 2 },
+      { name: "Stick",        ingredients: { Plank: 1 },           amount: 2 },
+      { name: "Wooden Crate", ingredients: { Plank: 4 },           amount: 1 },
+      { name: "Wooden Sword", ingredients: { Plank: 2, Stick: 1 }, amount: 1 },
+      { name: "Wooden Axe",   ingredients: { Plank: 3, Stick: 2 }, amount: 1 },
+      { name: "Stone Axe",    ingredients: { Stone: 3, Stick: 2 }, amount: 1 },
+      { name: "Stone Sword",  ingredients: { Stone: 2, Stick: 1 }, amount: 1 },
+    ];
+    const selectedResources = new Set();
+
+    function canCraft(recipe) {
+      return Object.entries(recipe.ingredients).every(([item, amt]) => (inventory[item] || 0) >= amt);
+    }
+
+    function craft(recipe) {
+      if (!canCraft(recipe)) return;
+      pushUndo(null);
+      for (const [item, amt] of Object.entries(recipe.ingredients)) inventory[item] -= amt;
+      inventory[recipe.name] = (inventory[recipe.name] || 0) + recipe.amount;
+      renderInventory();
+      renderCrafting();
+    }
+
+    function renderCrafting() {
+      const itemsDiv = document.getElementById('CraftItems');
+      const recipesDiv = document.getElementById('CraftRecipes');
+      const names = Object.keys(inventory).filter(n => inventory[n] > 0);
+
+      // forget selections for items that are used up
+      [...selectedResources].forEach(n => { if (!names.includes(n)) selectedResources.delete(n); });
+
+      itemsDiv.innerHTML = '';
+      if (names.length === 0) itemsDiv.textContent = 'Your inventory is empty.';
+      names.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'CraftItem' + (selectedResources.has(n) ? ' selected' : '');
+        el.innerHTML = `<b>${n}</b><span>x${inventory[n]}</span>`;
+        el.addEventListener('click', () => {
+          if (selectedResources.has(n)) selectedResources.delete(n);
+          else selectedResources.add(n);
+          renderCrafting();
+        });
+        itemsDiv.appendChild(el);
+      });
+
+      recipesDiv.innerHTML = '';
+      if (selectedResources.size === 0) {
+        recipesDiv.textContent = 'Select resources to see what you can make.';
+        return;
+      }
+
+      // every recipe that only needs the selected resources
+      const matches = recipes.filter(r => Object.keys(r.ingredients).every(i => selectedResources.has(i)));
+      if (matches.length === 0) {
+        recipesDiv.textContent = 'No recipes use only those resources.';
+        return;
+      }
+
+      matches.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'CraftRecipe';
+        const needs = Object.entries(r.ingredients)
+          .map(([item, amt]) => `${amt} ${item} (have ${inventory[item] || 0})`)
+          .join(', ');
+        row.innerHTML = `<span><b>${r.name}</b> x${r.amount} &mdash; needs ${needs}</span>`;
+        const btn = document.createElement('button');
+        btn.textContent = 'Craft';
+        btn.disabled = !canCraft(r);
+        btn.addEventListener('click', () => craft(r));
+        row.appendChild(btn);
+        recipesDiv.appendChild(row);
+      });
+    }
+
+    function setMenu(name) {
+      openMenu = name;
+      document.getElementById('InventoryDim').style.display = name ? 'block' : 'none';
+      document.getElementById('InventoryPanel').style.display = name === 'inventory' ? 'block' : 'none';
+      document.getElementById('CraftingPanel').style.display = name === 'crafting' ? 'block' : 'none';
+      if (name === 'crafting') renderCrafting();
+    }
+
+    document.getElementById('EndTurnBtn').addEventListener('click', function() {
+      endTurn();
+      this.blur(); // so Space/Enter don't re-trigger the button
+    });
+    document.getElementById('UndoBtn').addEventListener('click', function() {
+      undo();
+      this.blur();
+    });
+    document.getElementById('InventoryBtn').addEventListener('click', function() {
+      setMenu('inventory');
+      this.blur();
+    });
+    document.getElementById('CraftingBtn').addEventListener('click', function() {
+      setMenu('crafting');
+    });
+    document.getElementById('InventoryClose').addEventListener('click', () => setMenu(null));
+    document.getElementById('CraftingClose').addEventListener('click', () => setMenu('inventory'));
+    document.getElementById('InventoryDim').addEventListener('click', () => setMenu(null));
+
+    document.addEventListener('keydown', e => {
+      // While a menu is open, only allow closing it
+      if (openMenu) {
+        if (e.key === 'Escape' ||
+            (e.key === 'i' && openMenu === 'inventory') ||
+            (e.key === 'c' && openMenu === 'crafting')) setMenu(null);
+        return;
+      }
+      if (e.key === 'i') { setMenu('inventory'); return; }
+      if (e.key === 'c') { setMenu('crafting'); return; }
+
+      const step = 50;
+
+      if (e.key === 'w') cameraOffsetY -= step;
+      if (e.key === 's') cameraOffsetY += step;
+      if (e.key === 'a') cameraOffsetX -= step;
+      if (e.key === 'd') cameraOffsetX += step;
+
+      if (e.key === ' ') {
+        cameraOffsetX = 0;
+        cameraOffsetY = 0;
+      }
+
+      // End turn: refresh stamina to full
+      if (e.key === 'Enter') {
+        endTurn();
+      }
+
+      generateVisibleMap();
+    });
+
+    document.addEventListener('click', function(event) {
+      // Clicks on buttons or the inventory shouldn't move the player
+      if (openMenu || event.target.closest('button, #InventoryDim, #InventoryPanel, #CraftingPanel')) return;
+
+      const cameraX = PlayerX + cameraOffsetX;
+      const cameraY = PlayerY + cameraOffsetY;
+
+      const worldClickX = event.clientX - canvas.width / 2 + cameraX;
+      const worldClickY = event.clientY - canvas.height / 2 + cameraY;
+
+      tiles.forEach(tile => {
+        if (worldClickX >= tile.x && worldClickX <= tile.x + tileSize &&
+            worldClickY >= tile.y && worldClickY <= tile.y + tileSize) {
+
+          const key = getTileKey(tile.x / tileSize, tile.y / tileSize);
+          if (tile.CanMoveTo && !tile.Enemy && reachable.has(key)) {
+            pushUndo(null);
+            stamina -= reachable.get(key); // 1 stamina per tile traveled
+            PlayerX = tile.x;
+            PlayerY = tile.y;
+            generateVisibleMap();
+          } else if (canMine(tile)) {
+            mineTile(tile);
+          } else if (canAttack(tile)) {
+            attackMob(tile);
+          }
+        }
+      });
+    });
+
+    function draw() {
+      const cameraX = PlayerX + cameraOffsetX;
+      const cameraY = PlayerY + cameraOffsetY;
+
+      Player.style.left = canvas.width / 2 - cameraOffsetX + 5 + 'px';
+      Player.style.top = canvas.height / 2 - cameraOffsetY + 5 + 'px';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'black';
+
+      tiles.forEach(tile => {
+        const key = getTileKey(tile.x / tileSize, tile.y / tileSize);
+
+        if (tile.type === "forest") ctx.fillStyle = "darkgreen";
+        else if (tile.type === "rock") ctx.fillStyle = "#777";
+        else if (reachable.has(key)) ctx.fillStyle = "rgba(255,0,0,0.3)";
+        else ctx.fillStyle = "rgba(101,67,33,0.4)";
+
+        const screenX = tile.x - cameraX + canvas.width / 2;
+        const screenY = tile.y - cameraY + canvas.height / 2;
+        ctx.fillRect(screenX, screenY, tileSize, tileSize);
+        ctx.strokeRect(screenX, screenY, tileSize, tileSize);
+
+        // Orange outline on adjacent tiles you can mine right now
+        if (canMine(tile)) {
+          ctx.strokeStyle = 'orange';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(screenX + 1.5, screenY + 1.5, tileSize - 3, tileSize - 3);
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 1;
+        }
+
+        // Red outline on adjacent mobs you can attack right now
+        if (canAttack(tile)) {
+          ctx.strokeStyle = 'red';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(screenX + 1.5, screenY + 1.5, tileSize - 3, tileSize - 3);
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 1;
+        }
+      });
+
+      drawMobs(cameraX, cameraY);
+
+      // Day/night: fade a dark blue overlay in and out
+      displayDarkness += (darknessByHour[hour] - displayDarkness) * 0.05;
+      if (displayDarkness > 0.01) {
+        ctx.fillStyle = `rgba(5, 10, 40, ${displayDarkness})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // HUD
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      ctx.fillRect(10, 8, 350, 84);
+      ctx.fillStyle = 'white';
+      ctx.font = '20px sans-serif';
+      ctx.fillText(`Stamina: ${stamina} / ${maxStamina}`, 20, 34);
+      ctx.fillText(`HP: ${hp} / ${maxHP}`, 240, 34);
+      ctx.fillText(timeLabel(), 20, 60);
+      ctx.font = '14px sans-serif';
+      
+
+      if (Date.now() < messageUntil) {
+        ctx.font = '20px sans-serif';
+        const w = ctx.measureText(message).width + 30;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(canvas.width / 2 - w / 2, 20, w, 40);
+        ctx.fillStyle = 'white';
+        ctx.fillText(message, canvas.width / 2 - w / 2 + 15, 47);
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    setCanvas();
+
+    Player.style.left = canvas.width / 2 - cameraOffsetX + 5 + 'px';
+    Player.style.top  = canvas.height / 2 - cameraOffsetY + 5 + 'px';
+
+    // Never spawn inside a tree: the starting tile is always plain
+    const spawnTile = getOrCreateTile(PlayerX / tileSize, PlayerY / tileSize);
+    spawnTile.type = "plain";
+    spawnTile.CanMoveTo = true;
+
+    generateVisibleMap();
+
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
