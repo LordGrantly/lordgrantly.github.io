@@ -192,6 +192,40 @@
           font-size: 15px;
           cursor: pointer;
         }
+        /* Mobile / small screens */
+@media (max-width: 600px), (pointer: coarse) and (max-height: 600px) {
+  .GameButton {
+    bottom: 10px;
+    padding: 6px 11px;
+    font-size: 13px;
+    border-width: 1px;
+    border-radius: 6px;
+  }
+  #InventoryBtn { left: 10px; }
+  #EndTurnBtn   { right: 10px; }
+  #UndoBtn      { right: 88px; }
+
+  #InventoryPanel, #CraftingPanel {
+    width: 94vw;
+    height: 90vh;
+    padding: 12px;
+  }
+  #InventoryPanel h2, #CraftingPanel h2 { font-size: 18px; margin-bottom: 8px; }
+  #InventoryClose, #CraftingClose {
+    top: 10px; right: 10px;
+    padding: 4px 10px; font-size: 13px;
+  }
+  #CraftingBtn {
+    top: 10px; right: 70px;
+    padding: 4px 10px; font-size: 13px;
+  }
+  #InventoryGrid { grid-template-columns: repeat(auto-fill, 56px); gap: 6px; }
+  .InventorySlot { width: 56px; height: 56px; font-size: 11px; }
+  .CraftItem { width: 64px; height: 56px; font-size: 11px; }
+  .CraftRecipe { font-size: 13px; padding: 8px; }
+  .CraftRecipe button { padding: 4px 10px; font-size: 13px; }
+  .EquipSlot { font-size: 13px; padding: 6px 8px; }
+}
         body{
           margin: 0;
           overflow: hidden;
